@@ -29,6 +29,12 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 class Timecard;
 class QTimer;
 
+/*!
+ * Redo and Undo actions for the check in command.
+ *
+ * This command checks in the worker and sets an alarm if needed. Undo restores
+ * all the data as it was before the command, and removed the alarm.
+ */
 class CheckinCommand : public QUndoCommand
 {
 
@@ -48,6 +54,12 @@ private:
     Worker checkedInWorker_;
 };
 
+/*!
+ * Redo and Undo actions for the check out command
+ *
+ * This command checks in the worker and removes any pending alarm. Undo restores
+ * all the data as it was before the command, and re-sets the alarm.
+ */
 class CheckoutCommand : public QUndoCommand
 {
 
@@ -68,6 +80,10 @@ private:
 
 };
 
+/*!
+ * Redo and Undo actions for the "edit balance" command (triggered when the
+ * balance in the balance spin box is edited)
+ */
 class EditBalanceCommand : public QUndoCommand
 {
 
@@ -85,6 +101,9 @@ private:
     Worker& worker_;
 };
 
+/*!
+ * Redo and Undo actions for the "clear all" command
+ */
 class ClearAllCommand : public QUndoCommand
 {
 public:

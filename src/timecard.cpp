@@ -35,19 +35,21 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #define DEFAULT_WORKDAY (7.5*3600)
 #define TIMER_VALUE_IN_MSEC 60000
-#define APP_ID "com.balenet.slackr"
+#define APP_ID "com.balenet.flexo"
 
 enum { onExitAsk = 0, onExitCheckout = 1, onExitStayCheckedIn = 2 };
 
 Timecard::Timecard(QWidget* parent)	
         : QMainWindow(parent), alarm(0)
 {
-    undoStack = new QUndoStack();
-
     setupUi(this);
-
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 
+    QAction *actionReset = new QAction(tr("Clear All"), this);
+    menuBar()->addAction(actionReset);
+    connect(actionReset, SIGNAL(triggered()), this, SLOT(reset()));
+
+    undoStack = new QUndoStack();
     createUndoActions();
 
     toolbarGroup = new QActionGroup(this);
@@ -78,7 +80,7 @@ void Timecard::updateView()
     bool showText = false;
 
     if (worker.isWorking()) {
-        checkInButton->setChecked(true);
+        checkInToggle->setChecked(true);
         balanceEdit->setEnabled(false);
         if (worker.lastCheckin()) {
             out << "Checked in at " <<
@@ -87,7 +89,7 @@ void Timecard::updateView()
         }
     }
     else {
-        checkInButton->setChecked(false);
+        checkInToggle->setChecked(false);
         balanceEdit->setEnabled(true);
         if (worker.lastCheckout()){
             out << "Checked out at " <<
@@ -106,7 +108,7 @@ void Timecard::updateView()
     displayBalance();
 }
 
-void Timecard::on_checkInButton_clicked()
+void Timecard::on_checkInToggle_clicked()
 {
     if (!worker.isWorking()) {
         QUndoCommand* checkinCommand = new CheckinCommand(worker, this, timer);
@@ -154,7 +156,7 @@ void Timecard::on_actionClock_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(clockPage);
-        setWindowTitle("Clock");
+        setWindowTitle(actionClock->text());
     }
 }
 
@@ -162,7 +164,7 @@ void Timecard::on_actionBalance_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(balancePage);
-        setWindowTitle("Balance");
+        setWindowTitle(actionBalance->text());
     }
 }
 
@@ -170,7 +172,7 @@ void Timecard::on_actionSettings_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(settingsPage);
-        setWindowTitle("Settings");
+        setWindowTitle(actionSettings->text());
     }
 }
 
@@ -206,7 +208,7 @@ void Timecard::displayBalance()
         balanceEdit->setValue(b);
 }
 
-void Timecard::on_actionReset_triggered()
+void Timecard::reset()
 {
     qDebug() << "Reset";
 
@@ -298,15 +300,15 @@ void Timecard::closeEvent(QCloseEvent* event)
         if (exitOption == onExitAsk) {
             ExitDialog dialog(this);
             if (defaultExitDialogOption == onExitCheckout) {
-                dialog.checkoutButton->setChecked(true);
+                dialog.checkoutOption->setChecked(true);
             }
             else {
-                dialog.checkinButton->setChecked(true);
+                dialog.checkinOption->setChecked(true);
             }
             if (dialog.exec()) {
                 int choice;
-                if (dialog.checkoutButton->isChecked()) {
-                    on_checkInButton_clicked();
+                if (dialog.checkoutOption->isChecked()) {
+                    on_checkInToggle_clicked();
                     choice = onExitCheckout;
                 }
                 else {
@@ -323,7 +325,7 @@ void Timecard::closeEvent(QCloseEvent* event)
             }
         }
         else if (exitOption == onExitCheckout) {
-            on_checkInButton_clicked();
+            on_checkInToggle_clicked();
         }
     }
     event->accept();
@@ -350,13 +352,11 @@ void Timecard::createUndoActions()
 {
     undoAction = undoStack->createUndoAction(this, tr("&Undo"));
     undoAction->setShortcuts(QKeySequence::Undo);
-    menuEdit->insertAction(actionReset, undoAction);
+    menuBar()->addAction(undoAction);
 
     redoAction = undoStack->createRedoAction(this, tr("&Redo"));
     redoAction->setShortcuts(QKeySequence::Redo);
-    menuEdit->insertAction(actionReset, redoAction);
-
-    menuEdit->insertSeparator(actionReset);
+    menuBar()->addAction(redoAction);
 }
 
 void Timecard::setAlarm()
@@ -393,7 +393,7 @@ void Timecard::on_alarmCheckBox_toggled(bool b)
 
 Alarm* Timecard::createAlarm()
 {
-//#ifdef Q_WS_MAEMO_5
+#ifdef Q_WS_HILDON
     Maemo5Alarm* a;
 
     QList<alarm_id_t> alarmIds;
@@ -413,9 +413,10 @@ Alarm* Timecard::createAlarm()
         a->addDismissAction("Ok");
         a->addSnoozeAction("Remind me later");
     }
-// #else
-//  a = new TestAlarm();
-// #endif
+#else
+    TestAlarm* a;
+    a = new TestAlarm();
+#endif
     a->setMessage("It's time to go home!");
 
     return a;

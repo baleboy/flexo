@@ -30,7 +30,7 @@ extern QDateTime clock_;
 
 class QDateTime;
 
-/*
+/*!
  * This class represents a worker. A worker checks in and checks out from work multiple times in a
  * working day, and needs to complete a predefined amount of hours on each day it is at work.
  * As the worker keeps working, it accrues a balance of hours which can be positive or negative based

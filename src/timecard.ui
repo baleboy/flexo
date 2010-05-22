@@ -20,11 +20,7 @@
    <string>Flexo</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolBar {
-	background-image: url(:/images/toolbar-bg.png)
-}
-
-QToolButton {
+   <string notr="true">QToolButton {
 
 	margin-left: 10 px;
 	margin-right: 40 px;
@@ -40,16 +36,18 @@ QToolButton {
 
 QToolButton:pressed, QToolButton:checked {
 	color: white;
-    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:1 rgba(0, 175, 255, 255), stop:0 rgba(121, 249, 255, 255));
 } 
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QStackedWidget" name="mainView">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="clockPage">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -116,7 +114,7 @@ QToolButton:pressed, QToolButton:checked {
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="checkInButton">
+           <widget class="QPushButton" name="checkInToggle">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -342,7 +340,7 @@ QPushButton:pressed {
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QMenuBar" name="appMenuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -351,13 +349,6 @@ QPushButton:pressed {
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-    <addaction name="actionReset"/>
-   </widget>
-   <addaction name="menuEdit"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -407,7 +398,7 @@ QPushButton:pressed {
      <activeoff>:/images/clock.png</activeoff>:/images/clock-off.png</iconset>
    </property>
    <property name="text">
-    <string>clock</string>
+    <string>Clock</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -421,7 +412,7 @@ QPushButton:pressed {
      <activeoff>:/images/gear.png</activeoff>:/images/gear-off.png</iconset>
    </property>
    <property name="text">
-    <string>settings</string>
+    <string>Settings</string>
    </property>
   </action>
   <action name="actionBalance">
@@ -435,7 +426,7 @@ QPushButton:pressed {
      <activeoff>:/images/scale.png</activeoff>:/images/scale-off.png</iconset>
    </property>
    <property name="text">
-    <string>balance</string>
+    <string>Balance</string>
    </property>
   </action>
  </widget>

@@ -25,20 +25,20 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "testalarm.h"
 
 TestAlarm::TestAlarm()
-    : isSet(false)
+    : m_set(false)
 {
 }
 
 void TestAlarm::set()
 {
     qDebug() << "Alarm set for: " << time().toString() << " with message: " << message();
-    isSet = true;
+    m_set = true;
 }
 
 void TestAlarm::remove()
 {
-    assert(isSet);
+    assert(m_set);
 
     qDebug() << "Alarm removed";
-    isSet = false;
+    m_set = false;
 }

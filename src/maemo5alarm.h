@@ -28,6 +28,10 @@ struct alarm_event_t;
 
 typedef long alarm_id_t;
 
+/*!
+ * Implementation of the alarm interface for the Maemo 5 platform. Provides a wrapper for
+ * libalarm.h
+ */
 class Maemo5Alarm : public Alarm
 {
 public:
@@ -47,11 +51,14 @@ public:
     void set();
     void remove();
 
+    bool isSet() const {return m_set; };
+
     static void getAlarms(const QString&, QList<alarm_id_t>&);
 
 private:
 
     alarm_event_t *m_data;
+    bool m_set;
 
     void copy(const Maemo5Alarm&);
 };

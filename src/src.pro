@@ -26,8 +26,8 @@ SOURCES += main.cpp \
 RESOURCES += \
     resources.qrc
 
-#maemo5 {
+contains(QT_CONFIG, hildon): {
     LIBS += -lalarm
     SOURCES += maemo5alarm.cpp
     HEADERS += maemo5alarm.h
-#}
+}

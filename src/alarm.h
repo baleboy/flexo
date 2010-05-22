@@ -27,6 +27,10 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 class QDateTime;
 
+/*!
+ * Generic interface for alarms. At a minimum, an alarm has a time and a message,
+ * and can be set or removed.
+ */
 class Alarm
 {
 public:
@@ -36,11 +40,13 @@ public:
     void setMessage(const QString& m) { m_message = m; }
     void setTime(const QDateTime& t) {m_time = t; }
 
-    QString message() { return m_message; }
-    QDateTime time() { return m_time; }
+    QString message() const { return m_message; }
+    QDateTime time() const { return m_time; }
 
     virtual void set() = 0;
     virtual void remove() = 0;
+
+    virtual bool isSet() const = 0;
 
 private:
 

@@ -29,6 +29,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "maemo5alarm.h"
 
 Maemo5Alarm::Maemo5Alarm(const QString& myapp)
+    : m_set(false)
 {
     m_data = alarm_event_create();
     alarm_event_set_alarm_appid(m_data, myapp.toAscii().constData());
@@ -42,7 +43,10 @@ Maemo5Alarm::Maemo5Alarm(const Alarm &other)
 
 Maemo5Alarm::Maemo5Alarm(alarm_id_t cookie)
 {
-    m_data = alarmd_event_get(cookie);
+    if (cookie != 0) {
+        m_data = alarmd_event_get(cookie);
+        if (m_data) m_set = true;
+    }
 }
 
 Maemo5Alarm::~Maemo5Alarm()
@@ -74,6 +78,7 @@ void Maemo5Alarm::copy(const Maemo5Alarm& other)
              alarm_action_set_exec_command(act, other_act->exec_command);
          }
     }
+    m_set = other.m_set;
 }
 
 void Maemo5Alarm::setSnoozeTime(int secs)
@@ -117,15 +122,20 @@ void Maemo5Alarm::set()
         qDebug() << "Error adding alarm: " << m_data->cookie;
         return;
     }
+    m_set = true;
     qDebug() << "Alarm set for " << time().toString()
              << "with cookie " << m_data->cookie;
 }
 
 void Maemo5Alarm::remove()
 {
-    if( alarmd_event_del(m_data->cookie) == -1 )
-    {
-        qDebug() << "Unable to delete cookie" << m_data->cookie;
+    if (m_set) {
+        if( alarmd_event_del(m_data->cookie) == -1 )
+        {
+            qDebug() << "Unable to delete cookie" << m_data->cookie;
+            return;
+        }
+        m_set = false;
     }
 }
 

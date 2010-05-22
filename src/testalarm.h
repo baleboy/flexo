@@ -24,6 +24,10 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "alarm.h"
 
+/*!
+ * Implementation of the alarm interface for testing purposes. Meant to be used
+ * when compiling for the desktop.
+ */
 class TestAlarm : public Alarm
 {
 public:
@@ -31,10 +35,11 @@ public:
 
     void set();
     void remove();
+    bool isSet() const { return m_set; };
 
 private:
 
-    bool isSet;
+    bool m_set;
 };
 
 #endif // TESTALARM_H

@@ -32,6 +32,9 @@ class Alarm;
 
 class ExitDialog;
 
+/*!
+ * Implementation of the application logic for the main window.
+ */
 class Timecard : public QMainWindow, public Ui::Timecard
 {
     Q_OBJECT
@@ -45,7 +48,7 @@ public:
 
 private slots:
 
-    void on_checkInButton_clicked();
+    void on_checkInToggle_clicked();
     void on_balanceEdit_editingFinished();
     void on_balanceUnitSelector_currentIndexChanged(int);
     void on_exitOptionComboBox_currentIndexChanged(int);
@@ -56,7 +59,7 @@ private slots:
     void on_actionBalance_toggled(bool);
     void on_actionSettings_toggled(bool);
 
-    void on_actionReset_triggered();
+    void reset();
 
     void onTimer();
 

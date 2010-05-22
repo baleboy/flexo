@@ -23,6 +23,8 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "worker.h"
 
+// if compiled for test, replace the actual clock with a global variable
+// that can be manipulated by the test program
 #ifdef WORKER_TEST
 QDateTime clock_;
 #define CURRENT_TIME clock_
