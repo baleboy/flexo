@@ -68,7 +68,6 @@ private:
     QTimer *timer;
 
     QString textBuffer;
-    ExitDialog* exitDialog;
 
     Worker worker;
 
@@ -82,7 +81,6 @@ private:
     void restore();
     void printWorker();
     void createUndoActions();
-    void createExitDialog();
     Alarm* createAlarm();
 
     QUndoStack *undoStack;

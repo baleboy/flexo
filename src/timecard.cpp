@@ -40,7 +40,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 enum { onExitAsk = 0, onExitCheckout = 1, onExitStayCheckedIn = 2 };
 
 Timecard::Timecard(QWidget* parent)	
-        : QMainWindow(parent), exitDialog(0), alarm(0)
+        : QMainWindow(parent), alarm(0)
 {
     undoStack = new QUndoStack();
 
@@ -154,6 +154,7 @@ void Timecard::on_actionClock_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(clockPage);
+        setWindowTitle("Clock");
     }
 }
 
@@ -161,6 +162,7 @@ void Timecard::on_actionBalance_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(balancePage);
+        setWindowTitle("Balance");
     }
 }
 
@@ -168,6 +170,7 @@ void Timecard::on_actionSettings_toggled(bool checked)
 {
     if (checked) {
         mainView->setCurrentWidget(settingsPage);
+        setWindowTitle("Settings");
     }
 }
 
@@ -248,10 +251,7 @@ void Timecard::save()
     }
 
     settings.setValue("checkoutOnExit", exitOption);
-
-    if(exitDialog) {
-        settings.setValue("defaultExitDialogOption", defaultExitDialogOption);
-    }
+    settings.setValue("defaultExitDialogOption", defaultExitDialogOption);
 
     printWorker();
 }
@@ -288,21 +288,31 @@ void Timecard::restore()
 
 }
 
+// If the user is checked in and wants to be asked what to do on exit, show the dialog,
+// preselecting the option that was chosen last time. Finally save the user choices for
+// the next time.
 void Timecard::closeEvent(QCloseEvent* event)
 {
     qDebug() << "Closing...";
     if (worker.isWorking()) {
         if (exitOption == onExitAsk) {
-            if(!exitDialog) {
-                createExitDialog();
+            ExitDialog dialog(this);
+            if (defaultExitDialogOption == onExitCheckout) {
+                dialog.checkoutButton->setChecked(true);
             }
-            if (exitDialog->exec()) {
-                int choice = onExitStayCheckedIn;
-                if (exitDialog->checkoutButton->isChecked()) {
+            else {
+                dialog.checkinButton->setChecked(true);
+            }
+            if (dialog.exec()) {
+                int choice;
+                if (dialog.checkoutButton->isChecked()) {
                     on_checkInButton_clicked();
                     choice = onExitCheckout;
                 }
-                if (exitDialog->checkBox->isChecked()) {
+                else {
+                    choice = onExitStayCheckedIn;
+                }
+                if (dialog.checkBox->isChecked()) {
                     exitOption = choice;
                 }
                 defaultExitDialogOption = choice;
@@ -318,17 +328,6 @@ void Timecard::closeEvent(QCloseEvent* event)
     }
     event->accept();
     save();
-}
-
-void Timecard::createExitDialog()
-{
-    exitDialog = new ExitDialog(this);
-    if (defaultExitDialogOption == onExitCheckout) {
-        exitDialog->checkoutButton->setChecked(true);
-    }
-    else {
-        exitDialog->checkinButton->setChecked(true);
-    }
 }
 
 void Timecard::printWorker()
@@ -409,7 +408,7 @@ Alarm* Timecard::createAlarm()
         qDebug() << "existing alarm loaded, id " << alarmIds.first();
     }
     else {
-        assert(!worker.isWorking() || !useAlarm);
+        assert(!(worker.isWorking() && !worker.isOvertime())|| !useAlarm);
         a = new Maemo5Alarm(APP_ID);
         a->addDismissAction("Ok");
         a->addSnoozeAction("Remind me later");

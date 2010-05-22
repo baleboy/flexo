@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-Copyright (C) 2010 Francesco Balestrieri
-
-This file is part of Flexo - a time tracking application.
-
-Flexo is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Flexo is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
-
--->
 <ui version="4.0">
  <class>Timecard</class>
  <widget class="QMainWindow" name="Timecard">
@@ -37,7 +17,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>iSlack</string>
+   <string>Flexo</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QToolBar {
@@ -47,20 +27,21 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 QToolButton {
 
 	margin-left: 10 px;
-	margin-right: 10 px;
-	padding-left: 25 px;
-	padding-right: 25 px;
+	margin-right: 40 px;
+	padding-left: 10 px;
+	padding-right: 10 px;
+	padding-top: 10 px;
+	padding-bottom: 10 px;
 	font: 14px;
 	color: gray;
    	border-width: 1px;
-  border-radius: 10px;
+  border-radius: 7px;
 }
 
 QToolButton:pressed, QToolButton:checked {
 	color: white;
-	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:1 rgba(0, 175, 255, 255), stop:0 rgba(121, 249, 255, 255));
-}
-
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:1 rgba(0, 175, 255, 255), stop:0 rgba(121, 249, 255, 255));
+} 
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -392,7 +373,7 @@ QPushButton:pressed {
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>
