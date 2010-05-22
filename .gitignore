@@ -1,0 +1,9 @@
+*.o
+moc_*
+ui_*
+*.zip
+Makefile
+*.app
+*.exe
+*.moc
+*.user
