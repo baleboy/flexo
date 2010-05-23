@@ -38,6 +38,7 @@ private slots:
     void testSaveState();
     void testWithRealClock();
     void testOvertime();
+    void testNeverCheckedin();
 };
 
 void TestWorker::testConstructor()
@@ -315,6 +316,13 @@ void TestWorker::testOvertime()
 
 }
 
+void TestWorker::testNeverCheckedin()
+{
+    Worker w;
+    w.setBalance(200);
+    QCOMPARE(w.balanceInProgress(), 200);
+    QCOMPARE(w.balance(), 200);
+}
 
 QTEST_MAIN(TestWorker)
 #include "testworker.moc"

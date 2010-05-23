@@ -98,23 +98,22 @@ void CheckoutCommand::undo()
 
 // Edit Balance
 
-EditBalanceCommand::EditBalanceCommand(Timecard* ui, int b, Worker& w)
-    : ui_(ui), newBalance_(b), oldBalance_(w.balance()), worker_(w)
+EditBalanceCommand::EditBalanceCommand(Timecard* ui, int newb, int oldb)
+    : ui_(ui), newBalance_(newb), oldBalance_(oldb)
 {
     setText("Edit Balance");
 }
 
 void EditBalanceCommand::redo()
 {
-    qDebug() << "Edit Balance: " << newBalance_;
-    worker_.setBalance(newBalance_);
-    ui_->updateView();
+    qDebug() << "Edit Balance/redo: " << newBalance_;
+    ui_->setBalance(newBalance_);
 }
 
 void EditBalanceCommand::undo()
 {
-    worker_.setBalance(oldBalance_);
-    ui_->updateView();
+    qDebug() << "Edit Balance/undo: " << oldBalance_;
+    ui_->setBalance(oldBalance_);
 }
 
 // Clear All

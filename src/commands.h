@@ -89,7 +89,7 @@ class EditBalanceCommand : public QUndoCommand
 
 public:
 
-    EditBalanceCommand(Timecard*, int, Worker&);
+    EditBalanceCommand(Timecard*, int, int);
     void undo();
     void redo();
 
@@ -98,7 +98,6 @@ private:
     Timecard* ui_;
     int newBalance_;
     int oldBalance_;
-    Worker& worker_;
 };
 
 /*!

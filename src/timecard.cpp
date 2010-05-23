@@ -127,22 +127,37 @@ void Timecard::onTimer()
         displayBalance();
 }
 
+void Timecard::setBalance(int balance)
+{
+    worker.setBalance(balance);
+    double b;
+    if (showBalanceInHours) {
+        b = worker.balance() / 3600.0;
+    }
+    else {
+        b = worker.balance() / (double)worker.workdayLength();
+    }
+    balanceEdit->setValue(b);
+}
+
 void Timecard::on_balanceEdit_editingFinished()
 {
-        qDebug() << "Editing finished";
-	
-	double b = balanceEdit->text().toDouble();
-        int balance;
-	
-	if (showBalanceInHours) {
-		balance = b * 3600;
-	}
-	else {
-                balance = b * worker.workdayLength();
-	}
-        if (balance != worker.balance()) {
-           undoStack->push(new EditBalanceCommand(this, balance, worker));
-        }
+    qDebug() << "Editing finished, new value: " << balanceEdit->value();
+
+    double b = balanceEdit->text().toDouble();
+    int balance;
+
+    if (showBalanceInHours) {
+        balance = b * 3600;
+    }
+    else {
+        balance = b * worker.workdayLength();
+    }
+    if (balance != worker.balance()) {
+        undoStack->push(new EditBalanceCommand(this, balance, worker.balance()));
+    }
+
+    qDebug() << "Balance: " << worker.balance();
 }
 
 void Timecard::on_balanceUnitSelector_currentIndexChanged(int index)
@@ -200,10 +215,10 @@ void Timecard::displayBalance()
 {	
         double b = worker.balanceInProgress();
 	if (showBalanceInHours) {
-                b = b / 3600;
+                b = b / 3600.0;
 	}
 	else {
-                b = b / worker.workdayLength();
+                b = b / (double)worker.workdayLength();
 	}
         balanceEdit->setValue(b);
 }

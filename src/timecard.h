@@ -45,6 +45,7 @@ public:
     void updateView();
     void setAlarm();
     void removeAlarm();
+    void setBalance(int);
 
 private slots:
 

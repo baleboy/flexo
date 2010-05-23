@@ -20,6 +20,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QDateTime>
+#include <QtDebug>
 
 #include "worker.h"
 
@@ -248,12 +249,8 @@ void Worker::setBalance(int s)
 ///////////////////////////////////////////////////////////////////////////////
 int Worker::balanceInProgress() const
 {
-    if (!lastCheckin_) {
-       return 0;
-    }
-
-    if (!working_) {
-        return balance_;
+    if (!lastCheckin_ || !working_) {
+       return balance_;
     }
 
     int currentBalance = balance_;
