@@ -406,6 +406,11 @@ void Timecard::on_alarmCheckBox_toggled(bool b)
     }
 }
 
+void Timecard::Activate()
+{
+    activateWindow();
+}
+
 Alarm* Timecard::createAlarm()
 {
 #ifdef Q_WS_HILDON

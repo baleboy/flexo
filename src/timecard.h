@@ -47,6 +47,10 @@ public:
     void removeAlarm();
     void setBalance(int);
 
+public slots:
+
+    void Activate();
+
 private slots:
 
     void on_checkInToggle_clicked();

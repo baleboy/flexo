@@ -12,7 +12,8 @@ HEADERS += timecard.h \
     commands.h \
     exitdialog.h \
     alarm.h \
-    testalarm.h
+    testalarm.h \
+    dbusifadaptor.h
 
 FORMS += timecard.ui \
     exitdialog.ui
@@ -21,10 +22,13 @@ SOURCES += main.cpp \
     worker.cpp \
     commands.cpp \
     exitdialog.cpp \
-    testalarm.cpp
+    testalarm.cpp \
+    dbusifadaptor.cpp
 
 RESOURCES += \
     resources.qrc
+
+QT += dbus
 
 contains(QT_CONFIG, hildon): {
     LIBS += -lalarm
