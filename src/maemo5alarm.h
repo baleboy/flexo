@@ -47,6 +47,9 @@ public:
     void addDismissAction(const QString&);
     void addSnoozeAction(const QString&);
     void addExecAction(const QString& text, const QString& command);
+    void addDBusAction(const QString& text, const QString& service,
+                       const QString& interface, const QString& path,
+                       const QString& name);
 
     void set();
     void remove();

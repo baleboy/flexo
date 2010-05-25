@@ -114,6 +114,23 @@ void Maemo5Alarm::addExecAction(const QString& text, const QString& command)
     alarm_action_set_exec_command(action, command.toAscii().constData());
 }
 
+void Maemo5Alarm::addDBusAction(const QString& text, const QString& service,
+                                const QString& interface, const QString& path,
+                                const QString& name)
+{
+    alarm_action_t *action;
+
+    action = alarm_event_add_actions(m_data, 1);
+    alarm_action_set_label(action, text.toAscii().constData());
+    action->flags = ALARM_ACTION_WHEN_RESPONDED |
+                    ALARM_ACTION_DBUS_USE_ACTIVATION | ALARM_ACTION_TYPE_DBUS;
+    alarm_action_set_dbus_interface(action, interface.toAscii().constData());
+    alarm_action_set_dbus_service(action, service.toAscii().constData());
+    alarm_action_set_dbus_path(action, path.toAscii().constData());
+    // TODO: figure out what name should be there
+    alarm_action_set_dbus_name(action, name.toAscii().constData());
+}
+
 void Maemo5Alarm::set()
 {
     m_data->alarm_time = time().toTime_t();

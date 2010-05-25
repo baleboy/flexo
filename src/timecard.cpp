@@ -430,8 +430,10 @@ Alarm* Timecard::createAlarm()
     else {
         assert(!(worker.isWorking() && !worker.isOvertime())|| !useAlarm);
         a = new Maemo5Alarm(APP_ID);
-        a->addDismissAction("Ok");
+        a->addDismissAction("Dismiss");
         a->addSnoozeAction("Remind me later");
+        a->addDBusAction("Go to Checkout", "com.balenet.flexo", "com.balenet.flexo",
+                         "/com/balenet/flexo", "Activate");
     }
 #else
     TestAlarm* a;

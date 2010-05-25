@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
         QDBusConnection connection = QDBusConnection::sessionBus();
         bool ret = connection.registerService("com.balenet.flexo");
-        ret = connection.registerObject("/", &timecard);
+        ret = connection.registerObject("/com/balenet/flexo", &timecard);
 
 	return app.exec();
 }
