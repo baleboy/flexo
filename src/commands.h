@@ -26,7 +26,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "worker.h"
 
-class Timecard;
+class MainWindow;
 class QTimer;
 
 /*!
@@ -40,14 +40,14 @@ class CheckinCommand : public QUndoCommand
 
 public:
 
-    CheckinCommand(Worker&, Timecard*, QTimer*);
+    CheckinCommand(Worker&, MainWindow*, QTimer*);
     void undo();
     void redo();
 
 private:
 
     Worker& worker_;
-    Timecard* ui_;
+    MainWindow* ui_;
     QTimer* timer_;
     bool firstRedo_;
     Worker oldWorker_;
@@ -65,14 +65,14 @@ class CheckoutCommand : public QUndoCommand
 
 public:
 
-    CheckoutCommand(Worker&, Timecard*, QTimer*);
+    CheckoutCommand(Worker&, MainWindow*, QTimer*);
     void undo();
     void redo();
 
 private:
 
     Worker& worker_;
-    Timecard* ui_;
+    MainWindow* ui_;
     QTimer* timer_;
     bool firstRedo_;
     Worker oldWorker_;
@@ -89,13 +89,13 @@ class EditBalanceCommand : public QUndoCommand
 
 public:
 
-    EditBalanceCommand(Timecard*, int, int);
+    EditBalanceCommand(MainWindow*, int, int);
     void undo();
     void redo();
 
 private:
 
-    Timecard* ui_;
+    MainWindow* ui_;
     int newBalance_;
     int oldBalance_;
 };
@@ -106,13 +106,13 @@ private:
 class ClearAllCommand : public QUndoCommand
 {
 public:
-    ClearAllCommand(Timecard*, Worker&, QTimer*);
+    ClearAllCommand(MainWindow*, Worker&, QTimer*);
     void undo();
     void redo();
 
 private:
 
-    Timecard* ui_;
+    MainWindow* ui_;
     Worker& worker_;
     Worker oldWorker_;
     QTimer* timer_;

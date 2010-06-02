@@ -26,12 +26,12 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextStream>
 #include <QtDebug>
 
-#include "timecard.h"
+#include "mainwindow.h"
 #include "commands.h"
 
 // Check In
 
-CheckinCommand::CheckinCommand(Worker& w, Timecard* ui, QTimer* timer)
+CheckinCommand::CheckinCommand(Worker& w, MainWindow* ui, QTimer* timer)
                                    : worker_(w),
                                      ui_(ui),
                                      timer_(timer),
@@ -66,7 +66,7 @@ void CheckinCommand::undo()
 
 // Check Out
 
-CheckoutCommand::CheckoutCommand(Worker& w, Timecard* ui, QTimer* timer)
+CheckoutCommand::CheckoutCommand(Worker& w, MainWindow* ui, QTimer* timer)
     : worker_(w), ui_(ui), timer_(timer), firstRedo_(true)
 {
     oldWorker_ = w;
@@ -98,7 +98,7 @@ void CheckoutCommand::undo()
 
 // Edit Balance
 
-EditBalanceCommand::EditBalanceCommand(Timecard* ui, int newb, int oldb)
+EditBalanceCommand::EditBalanceCommand(MainWindow* ui, int newb, int oldb)
     : ui_(ui), newBalance_(newb), oldBalance_(oldb)
 {
     setText("Edit Balance");
@@ -118,7 +118,7 @@ void EditBalanceCommand::undo()
 
 // Clear All
 
-ClearAllCommand::ClearAllCommand(Timecard* ui, Worker& w, QTimer* timer)
+ClearAllCommand::ClearAllCommand(MainWindow* ui, Worker& w, QTimer* timer)
     : ui_(ui), worker_(w), oldWorker_(w), timer_(timer)
 {
     setText("Clear All");

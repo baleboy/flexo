@@ -7,7 +7,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += timecard.h \
+HEADERS += mainwindow.h \
     worker.h \
     commands.h \
     exitdialog.h \
@@ -15,10 +15,10 @@ HEADERS += timecard.h \
     testalarm.h \
     dbusifadaptor.h
 
-FORMS += timecard.ui \
+FORMS += mainwindow.ui \
     exitdialog.ui
 SOURCES += main.cpp \
-    timecard.cpp \
+    mainwindow.cpp \
     worker.cpp \
     commands.cpp \
     exitdialog.cpp \
@@ -30,7 +30,8 @@ RESOURCES += \
 
 QT += dbus
 
-contains(QT_CONFIG, hildon): {
+maemo5 {
+    QT += maemo5
     LIBS += -lalarm
     SOURCES += maemo5alarm.cpp
     HEADERS += maemo5alarm.h

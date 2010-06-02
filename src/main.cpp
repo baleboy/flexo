@@ -21,20 +21,20 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtGui>
 #include <QtDBus/QDBusConnection>
-#include "timecard.h"
+#include "mainwindow.h"
 #include "dbusifadaptor.h"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	
-	Timecard timecard;
+        MainWindow MainWindow;
 	
-        new DBusIfAdaptor(&timecard);
+        new DBusIfAdaptor(&MainWindow);
 
         QDBusConnection connection = QDBusConnection::sessionBus();
         bool ret = connection.registerService("com.balenet.flexo");
-        ret = connection.registerObject("/com/balenet/flexo", &timecard);
+        ret = connection.registerObject("/com/balenet/flexo", &MainWindow);
 
 	return app.exec();
 }
