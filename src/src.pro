@@ -36,3 +36,23 @@ maemo5 {
     SOURCES += maemo5alarm.cpp
     HEADERS += maemo5alarm.h
 }
+
+unix {
+    PREFIX = ../debian/flexo/usr
+    BINDIR = $$PREFIX/bin
+    DATADIR =$$PREFIX/share
+
+    DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
+
+    INSTALLS += target desktop service icon64
+
+    target.path =$$BINDIR
+
+    desktop.path = $$DATADIR/applications/hildon
+    desktop.files += ../data/flexo.desktop
+    service.path = $$DATADIR/dbus-1/services
+    service.files += ../data/com.balenet.flexo.service
+    icon64.path = $$DATADIR/icons/hicolor/64x64/apps
+    icon64.files += images/flexo.png
+ }
+

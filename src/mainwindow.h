@@ -47,6 +47,11 @@ public:
     void removeAlarm();
     void setBalance(int);
 
+    static const QString ORG_ID;
+    static const QString APP_NAME;
+    static const QString APP_ID;
+    static const QString DBUS_PATH;
+
 public slots:
 
     void Activate();
@@ -99,4 +104,7 @@ private:
 
     Alarm* alarm;
     bool useAlarm;
+
+    static const int DEFAULT_WORKDAY;
+    static const int TIMER_VALUE_IN_MSEC;
 }; 

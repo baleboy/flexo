@@ -33,8 +33,8 @@ int main(int argc, char **argv)
         new DBusIfAdaptor(&MainWindow);
 
         QDBusConnection connection = QDBusConnection::sessionBus();
-        bool ret = connection.registerService("com.balenet.flexo");
-        ret = connection.registerObject("/com/balenet/flexo", &MainWindow);
+        bool ret = connection.registerService(MainWindow::APP_ID);
+        ret = connection.registerObject(MainWindow::DBUS_PATH, &MainWindow);
 
 	return app.exec();
 }

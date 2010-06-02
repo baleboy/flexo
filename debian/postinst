@@ -1,0 +1,8 @@
+#!/bin/sh -e
+# postinst script for flexo
+
+gtk-update-icon-cache -f /usr/share/icons/hicolor
+
+exit 0
+
+

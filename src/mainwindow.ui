@@ -47,7 +47,7 @@ QToolButton:pressed, QToolButton:checked {
     <item>
      <widget class="QStackedWidget" name="mainView">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="clockPage">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -339,7 +339,7 @@ QPushButton:pressed {
         <item row="2" column="1">
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Remind when it's time to quit:</string>
+           <string>Alarm when it's time to quit:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

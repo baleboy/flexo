@@ -33,9 +33,13 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "testalarm.h"
 #include "maemo5alarm.h"
 
-#define DEFAULT_WORKDAY (7.5*3600)
-#define TIMER_VALUE_IN_MSEC 60000
-#define APP_ID "com.balenet.flexo"
+const int MainWindow::DEFAULT_WORKDAY = 7.5*3600;
+const int MainWindow::TIMER_VALUE_IN_MSEC = 60000;
+
+const QString MainWindow::ORG_ID = "balenet.com";
+const QString MainWindow::APP_NAME = "flexo";
+const QString MainWindow::APP_ID = ORG_ID + "." + APP_NAME;
+const QString MainWindow::DBUS_PATH = "/com/balenet/flexo";
 
 enum { onExitAsk = 0, onExitCheckout = 1, onExitStayCheckedIn = 2 };
 
@@ -244,7 +248,7 @@ void MainWindow::on_workdaySpinBox_editingFinished()
 
 void MainWindow::save()
 {
-    QSettings settings("balenet", "MainWindow");
+    QSettings settings(ORG_ID, APP_NAME);
 
     settings.setValue("balance", worker.balance());
     settings.setValue("working", worker.isWorking());
@@ -275,7 +279,7 @@ void MainWindow::save()
 
 void MainWindow::restore()
 {
-    QSettings settings("balenet", "MainWindow");
+    QSettings settings(ORG_ID, APP_NAME);
 
     worker.setBalance(settings.value("balance", 0).toInt());
     worker.setWorking(settings.value("working", false).toBool());
@@ -432,8 +436,8 @@ Alarm* MainWindow::createAlarm()
         a = new Maemo5Alarm(APP_ID);
         a->addDismissAction("Dismiss");
         a->addSnoozeAction("Remind me later");
-        a->addDBusAction("Go to Checkout", "com.balenet.flexo", "com.balenet.flexo",
-                         "/com/balenet/flexo", "Activate");
+        a->addDBusAction("Go to Checkout", APP_ID, APP_ID,
+                         DBUS_PATH, "Activate");
     }
 #else
     TestAlarm* a;
