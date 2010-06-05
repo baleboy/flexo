@@ -51,6 +51,7 @@ public:
     static const QString APP_NAME;
     static const QString APP_ID;
     static const QString DBUS_PATH;
+    static const QString SAVEFILE;
 
 public slots:
 
@@ -92,7 +93,6 @@ private:
     void displayBalance();
     void save();
     void restore();
-    void printWorker();
     void createUndoActions();
     Alarm* createAlarm();
 

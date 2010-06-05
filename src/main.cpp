@@ -26,15 +26,15 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, char **argv)
 {
-	QApplication app(argc, argv);
-	
-        MainWindow MainWindow;
-	
-        new DBusIfAdaptor(&MainWindow);
+    QApplication app(argc, argv);
 
-        QDBusConnection connection = QDBusConnection::sessionBus();
-        bool ret = connection.registerService(MainWindow::APP_ID);
-        ret = connection.registerObject(MainWindow::DBUS_PATH, &MainWindow);
+    MainWindow MainWindow;
 
-	return app.exec();
+    new DBusIfAdaptor(&MainWindow);
+
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    bool ret = connection.registerService(MainWindow::APP_ID);
+    ret = connection.registerObject(MainWindow::DBUS_PATH, &MainWindow);
+
+    return app.exec();
 }

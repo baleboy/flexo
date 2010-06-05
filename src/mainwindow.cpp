@@ -40,6 +40,7 @@ const QString MainWindow::ORG_ID = "balenet.com";
 const QString MainWindow::APP_NAME = "flexo";
 const QString MainWindow::APP_ID = ORG_ID + "." + APP_NAME;
 const QString MainWindow::DBUS_PATH = "/com/balenet/flexo";
+const QString MainWindow::SAVEFILE = "data.flexo";
 
 enum { onExitAsk = 0, onExitCheckout = 1, onExitStayCheckedIn = 2 };
 
@@ -250,63 +251,45 @@ void MainWindow::save()
 {
     QSettings settings(ORG_ID, APP_NAME);
 
-    settings.setValue("balance", worker.balance());
-    settings.setValue("working", worker.isWorking());
-    settings.setValue("workDoneToday", worker.workDoneToday());
-    settings.setValue("workdayLength", worker.workdayLength());
     settings.setValue("useAlarm", useAlarm);
-
-    if (worker.lastCheckin()) {
-        settings.setValue("hasCheckedIn", true);
-        settings.setValue("lastCheckin", *worker.lastCheckin());
-    }
-    else{
-        settings.setValue("hasCheckedIn", false);
-    }
-    if (worker.lastCheckout()) {
-        settings.setValue("hasCheckedOut", true);
-        settings.setValue("lastCheckout", *worker.lastCheckout());
-    }
-    else{
-        settings.setValue("hasCheckedOut", false);
-    }
-
     settings.setValue("checkoutOnExit", exitOption);
     settings.setValue("defaultExitDialogOption", defaultExitDialogOption);
 
-    printWorker();
+    QFile file(SAVEFILE);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qDebug() << "Couldn't open savefile";
+        return;
+    }
+    QDataStream out(&file);
+    out << worker;
+
+    qDebug() << worker.print();
 }
 
 void MainWindow::restore()
 {
+    QFile file(SAVEFILE);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "restore: no datafile";
+        worker.setWorkdayLength(DEFAULT_WORKDAY);
+    }
+    else {
+        QDataStream in(&file);
+        in >> worker;
+    }
+    qDebug() << worker.print();
+
     QSettings settings(ORG_ID, APP_NAME);
-
-    worker.setBalance(settings.value("balance", 0).toInt());
-    worker.setWorking(settings.value("working", false).toBool());
-    worker.setWorkDoneToday(settings.value("workDoneToday", 0).toInt());
-    worker.setWorkdayLength(settings.value("workdayLength", DEFAULT_WORKDAY).toInt());
-
-    bool getTime = settings.value("hasCheckedIn", false).toBool();
-    if (getTime) {
-         worker.setLastCheckin(settings.value("lastCheckin").toDateTime());
-    }
-    getTime = settings.value("hasCheckedOut", false).toBool();
-    if (getTime) {
-         worker.setLastCheckout(settings.value("lastCheckout").toDateTime());
-    }
 
     exitOption = settings.value("checkoutOnExit", 0).toInt();
     exitOptionComboBox->setCurrentIndex(exitOption);
     defaultExitDialogOption = settings.value("defaultExitDialogOption",
                                              onExitCheckout).toInt();
 
-    workdaySpinBox->setValue(worker.workdayLength() / 3600.0);
     useAlarm = settings.value("useAlarm", true).toBool();
-
     alarmCheckBox->setChecked(useAlarm);
 
-    printWorker();
-
+    workdaySpinBox->setValue(worker.workdayLength() / 3600.0);
 }
 
 // If the user is checked in and wants to be asked what to do on exit, show the dialog,
@@ -349,22 +332,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
     event->accept();
     save();
-}
-
-void MainWindow::printWorker()
-{
-    qDebug() << "balance: " << worker.balance();
-    qDebug() << "balanceInProgress: " << worker.balanceInProgress();
-    qDebug() << "workDoneToday: " << worker.workDoneToday();
-    qDebug() << "working: " << worker.isWorking();
-    qDebug() << "work in progress: " << worker.workInProgress();
-    qDebug() << "workday length: " << worker.workdayLength();
-    if (worker.lastCheckin()) {
-        qDebug() << "lastCheckin: " << worker.lastCheckin()->toString();
-    }
-    else {
-        qDebug() << "not checked in yet";
-    }
 }
 
 void MainWindow::createUndoActions()

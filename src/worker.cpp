@@ -49,6 +49,7 @@ Worker::Worker(const Worker &w)
     copy(w);
 }
 
+
 Worker::~ Worker()
 {
     if (lastCheckin_) delete lastCheckin_;
@@ -316,3 +317,70 @@ void Worker::clear()
     isHoliday_ = false;
 }
 
+QString Worker::print() const
+{
+    QString s;
+    QTextStream out(&s)
+            ;
+    out << "balance: " << balance() << endl;
+    out << "balanceInProgress: " << balanceInProgress() << endl;
+    out << "workDoneToday: " << workDoneToday() << endl;
+    out << "working: " << isWorking() << endl;
+    out << "work in progress: " << workInProgress() << endl;
+    out << "workday length: " << endl;
+
+    if (lastCheckin())
+        out << "lastCheckin: " << lastCheckin()->toString();
+    else
+        out << "not checked in yet";
+    out << endl;
+
+    if (lastCheckout())
+        out << "lastCheckout: " << lastCheckin()->toString();
+    else
+        out << "not checked out yet";
+    out << endl;
+
+    return s;
+
+}
+
+QDataStream& operator>> (QDataStream& in, Worker& w)
+{
+    quint32 balance;
+    quint8 working;
+    quint32 doneToday;
+    quint32 wdayLength;
+    quint8 hasTime;
+    QDateTime time;
+
+    in >> balance >> working >> doneToday >> wdayLength >> hasTime;
+    if (hasTime) {
+        in >> time;
+        w.setLastCheckin(time);
+    }
+    in >> hasTime;
+    if (hasTime) {
+        in >> time;
+        w.setLastCheckout(time);
+    }
+
+    w.setBalance(balance);
+    w.setWorking(working);
+    w.setWorkDoneToday(doneToday);
+    w.setWorkdayLength(wdayLength);
+
+    return in;
+}
+
+QDataStream& operator<< (QDataStream& out, const Worker& w)
+{
+    out << quint32(w.balance()) << quint8(w.isWorking()) << quint32(w.workDoneToday())
+            << quint32(w.workdayLength()) << quint8(w.lastCheckin() != NULL);
+    if (w.lastCheckin())
+        out << *w.lastCheckin();
+    out << quint8(w.lastCheckout() != NULL);
+    if (w.lastCheckout())
+        out << *w.lastCheckout();
+    return out;
+}

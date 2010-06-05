@@ -35,10 +35,11 @@ private slots:
     void testShortBalance();
     void testDayChange();
     void testNewDay();
-    void testSaveState();
     void testWithRealClock();
     void testOvertime();
     void testNeverCheckedin();
+    void testSerialization();
+    void testPrint();
 };
 
 void TestWorker::testConstructor()
@@ -241,37 +242,6 @@ void TestWorker::testNewDay()
     QVERIFY(w.workDoneToday() == 0);
 }
 
-void TestWorker::testSaveState()
-{
-    Worker w1, w2;
-    int workday = 3600*7.5;
-    w1.setWorkdayLength(workday);
-    QDateTime checkinTime = QDateTime::fromString("09:30", "hh:mm");
-    clock_ = checkinTime;
-
-    w1.checkin();
-
-    clock_ = clock_.addSecs(300);
-
-    QVERIFY(w1.workInProgress() == 300);
-    QVERIFY(w1.balance() == -workday);
-    QVERIFY(w1.balanceInProgress() == 300 - workday);
-    QVERIFY(w1.isWorking());
-
-    w2.setWorkdayLength(workday);
-    w2.setBalance(w1.balance());
-    w2.setWorkDoneToday(w1.workDoneToday());
-    w2.setWorking(w1.isWorking());
-    w2.setLastCheckin(*w1.lastCheckin());
-
-    clock_ = clock_.addSecs(300);
-
-    QCOMPARE(w1.workInProgress(), w2.workInProgress());
-    QCOMPARE(w1.balance(), w2.balance());
-    QCOMPARE(w1.balanceInProgress(), w2.balanceInProgress());
-    QCOMPARE(w1.workDoneToday(), w2.workDoneToday());
-}
-
 void TestWorker::testWithRealClock()
 {
     Worker w;
@@ -296,8 +266,8 @@ void TestWorker::testOvertime()
 {
     Worker w;
 
-    clock_ = QDateTime::fromString("M1d1y0911:01:02",
-                                   "'M'M'd'd'y'yyhh:mm:ss");
+    clock_ = QDateTime::fromString("M1d1y201011:01:02",
+                                   "'M'M'd'd'y'yyyyhh:mm:ss");
     QVERIFY(!w.isHoliday());
 
     w.checkin();
@@ -322,6 +292,73 @@ void TestWorker::testNeverCheckedin()
     w.setBalance(200);
     QCOMPARE(w.balanceInProgress(), 200);
     QCOMPARE(w.balance(), 200);
+}
+
+void TestWorker::testSerialization()
+{
+    Worker w1;
+    int workday = 3600*7.5;
+    w1.setWorkdayLength(workday);
+    QDateTime checkinTime = QDateTime::fromString("M1d1y201011:01:02",
+                                                  "'M'M'd'd'y'yyyyhh:mm:ss");
+    clock_ = checkinTime;
+
+    w1.checkin();
+
+    clock_ = clock_.addSecs(300);
+
+    QBuffer b;
+    b.open(QIODevice::WriteOnly);
+    QDataStream stream(&b);
+    stream << w1;
+    b.close();
+
+    b.open(QIODevice::ReadOnly);
+    Worker w2;
+    stream >> w2;
+    b.close();
+
+    clock_ = clock_.addSecs(300);
+
+    qDebug() << w1.print();
+    qDebug() << w2.print();
+
+    QCOMPARE(w1.workInProgress(), w2.workInProgress());
+    QCOMPARE(w1.balance(), w2.balance());
+    QCOMPARE(w1.balanceInProgress(), w2.balanceInProgress());
+    QCOMPARE(w1.workDoneToday(), w2.workDoneToday());
+    QCOMPARE(*w1.lastCheckin(), *w2.lastCheckin());
+
+    w1.checkout();
+    b.open(QIODevice::WriteOnly);
+    stream << w1;
+    b.close();
+
+    b.open(QIODevice::ReadOnly);
+    stream >> w2;
+
+    QCOMPARE(w1.workInProgress(), w2.workInProgress());
+    QCOMPARE(w1.balance(), w2.balance());
+    QCOMPARE(w1.balanceInProgress(), w2.balanceInProgress());
+    QCOMPARE(w1.workDoneToday(), w2.workDoneToday());
+    QCOMPARE(*w1.lastCheckin(), *w2.lastCheckin());
+    QCOMPARE(*w1.lastCheckout(), *w2.lastCheckout());
+
+}
+
+void TestWorker::testPrint()
+{
+    Worker w;
+
+    int workday = 3600*7.5;
+    w.setWorkdayLength(workday);
+    QDateTime checkinTime = QDateTime::fromString("M1d1y201011:01:02",
+                                                  "'M'M'd'd'y'yyyyhh:mm:ss");
+    clock_ = checkinTime;
+
+    w.checkin();
+
+    qDebug() << w.print();
 }
 
 QTEST_MAIN(TestWorker)

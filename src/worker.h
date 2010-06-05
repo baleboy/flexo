@@ -139,6 +139,8 @@ public:
      */
     bool isHoliday(const QDateTime&) const;
 
+    QString print() const;
+
     // assorted accessor methods generally used at initialization and when storing state
     // (probably would make sense to have state saving functions instead)
     void setLastCheckin(const QDateTime&);
@@ -167,4 +169,9 @@ private:
     void copy(const Worker&);
 
 };
+
+QDataStream& operator<< (QDataStream&, const Worker&);
+
+QDataStream& operator>> (QDataStream&, Worker&);
+
 #endif // WORKER_H
