@@ -89,15 +89,16 @@ class EditBalanceCommand : public QUndoCommand
 
 public:
 
-    EditBalanceCommand(MainWindow*, int, int);
+    EditBalanceCommand(BalanceWindow*, int newBalance, Worker*);
     void undo();
     void redo();
 
 private:
 
-    MainWindow* ui_;
-    int newBalance_;
-    int oldBalance_;
+    BalanceWindow* m_window;
+    int m_newBalance;
+    int m_oldBalance;
+    Worker *m_worker;
 };
 
 /*!

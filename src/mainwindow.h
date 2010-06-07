@@ -29,8 +29,10 @@ class QTimer;
 class QUndoStack;
 class QActionGroup;
 class Alarm;
-
+class BalanceWindow;
 class ExitDialog;
+class Preferences;
+class PreferencesWindow;
 
 /*!
  * Implementation of the application logic for the main window.
@@ -45,13 +47,6 @@ public:
     void updateView();
     void setAlarm();
     void removeAlarm();
-    void setBalance(int);
-
-    static const QString ORG_ID;
-    static const QString APP_NAME;
-    static const QString APP_ID;
-    static const QString DBUS_PATH;
-    static const QString SAVEFILE;
 
 public slots:
 
@@ -60,15 +55,9 @@ public slots:
 private slots:
 
     void on_checkInToggle_clicked();
-    void on_balanceEdit_editingFinished();
-    void on_balanceUnitSelector_currentIndexChanged(int);
-    void on_exitOptionComboBox_currentIndexChanged(int);
-    void on_workdaySpinBox_editingFinished();
-    void on_alarmCheckBox_toggled(bool);
-
-    void on_actionClock_toggled(bool);
-    void on_actionBalance_toggled(bool);
-    void on_actionSettings_toggled(bool);
+    void on_balanceButton_clicked();
+    void on_settingsButton_clicked();
+    void toggleAlarm(bool);
 
     void reset();
 
@@ -85,10 +74,6 @@ private:
 
     Worker worker;
 
-    bool showBalanceInHours;
-    int exitOption;
-    int defaultExitDialogOption;
-
     void displayTimeAtWork();
     void displayBalance();
     void save();
@@ -103,8 +88,9 @@ private:
     QActionGroup *toolbarGroup;
 
     Alarm* alarm;
-    bool useAlarm;
 
-    static const int DEFAULT_WORKDAY;
-    static const int TIMER_VALUE_IN_MSEC;
+    BalanceWindow* m_balanceWindow;
+    PreferencesWindow* m_preferencesWindow;
+
+    Preferences* m_preferences;
 }; 

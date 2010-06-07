@@ -32,23 +32,17 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "exitdialog.h"
 #include "testalarm.h"
 #include "maemo5alarm.h"
-
-const int MainWindow::DEFAULT_WORKDAY = 7.5*3600;
-const int MainWindow::TIMER_VALUE_IN_MSEC = 60000;
-
-const QString MainWindow::ORG_ID = "balenet.com";
-const QString MainWindow::APP_NAME = "flexo";
-const QString MainWindow::APP_ID = ORG_ID + "." + APP_NAME;
-const QString MainWindow::DBUS_PATH = "/com/balenet/flexo";
-const QString MainWindow::SAVEFILE = "data.flexo";
-
-enum { onExitAsk = 0, onExitCheckout = 1, onExitStayCheckedIn = 2 };
+#include "balancewindow.h"
+#include "preferenceswindow.h"
+#include "constants.h"
+#include "preferences.h"
 
 MainWindow::MainWindow(QWidget* parent)
-        : QMainWindow(parent), alarm(0)
+        : QMainWindow(parent), alarm(0), m_balanceWindow(0)
 {
     setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
+    setAttribute(Qt::WA_Maemo5StackedWindow);
 
     QAction *actionReset = new QAction(tr("Clear All"), this);
     menuBar()->addAction(actionReset);
@@ -57,19 +51,13 @@ MainWindow::MainWindow(QWidget* parent)
     undoStack = new QUndoStack();
     createUndoActions();
 
-    toolbarGroup = new QActionGroup(this);
-    toolbarGroup->addAction(actionClock);
-    toolbarGroup->addAction(actionBalance);
-    toolbarGroup->addAction(actionSettings);
-    actionClock->setChecked(true);
-
     timer = new QTimer(this);
     timer->setInterval(TIMER_VALUE_IN_MSEC);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
+    m_preferences = new Preferences();
+
     restore();
-    balanceUnitSelector->setCurrentIndex(0);
-    showBalanceInHours = true;
 
     alarm = createAlarm();
 
@@ -86,7 +74,6 @@ void MainWindow::updateView()
 
     if (worker.isWorking()) {
         checkInToggle->setChecked(true);
-        balanceEdit->setEnabled(false);
         if (worker.lastCheckin()) {
             out << "Checked in at " <<
                     worker.lastCheckin()->time().toString("hh:mm");
@@ -95,7 +82,6 @@ void MainWindow::updateView()
     }
     else {
         checkInToggle->setChecked(false);
-        balanceEdit->setEnabled(true);
         if (worker.lastCheckout()){
             out << "Checked out at " <<
                     worker.lastCheckout()->time().toString("hh:mm");
@@ -110,7 +96,6 @@ void MainWindow::updateView()
         checkInText->setText("");
     }
     displayTimeAtWork();
-    displayBalance();
 }
 
 void MainWindow::on_checkInToggle_clicked()
@@ -129,71 +114,6 @@ void MainWindow::on_checkInToggle_clicked()
 void MainWindow::onTimer()
 {		
         displayTimeAtWork();
-        displayBalance();
-}
-
-void MainWindow::setBalance(int balance)
-{
-    worker.setBalance(balance);
-    double b;
-    if (showBalanceInHours) {
-        b = worker.balance() / 3600.0;
-    }
-    else {
-        b = worker.balance() / (double)worker.workdayLength();
-    }
-    balanceEdit->setValue(b);
-}
-
-void MainWindow::on_balanceEdit_editingFinished()
-{
-    qDebug() << "Editing finished, new value: " << balanceEdit->value();
-
-    double b = balanceEdit->text().toDouble();
-    int balance;
-
-    if (showBalanceInHours) {
-        balance = b * 3600;
-    }
-    else {
-        balance = b * worker.workdayLength();
-    }
-    if (balance != worker.balance()) {
-        undoStack->push(new EditBalanceCommand(this, balance, worker.balance()));
-    }
-
-    qDebug() << "Balance: " << worker.balance();
-}
-
-void MainWindow::on_balanceUnitSelector_currentIndexChanged(int index)
-{
-        qDebug() << "Index changed: " << index;
-	showBalanceInHours = (index == 0);
-	displayBalance();
-}
-
-void MainWindow::on_actionClock_toggled(bool checked)
-{
-    if (checked) {
-        mainView->setCurrentWidget(clockPage);
-        setWindowTitle(actionClock->text());
-    }
-}
-
-void MainWindow::on_actionBalance_toggled(bool checked)
-{
-    if (checked) {
-        mainView->setCurrentWidget(balancePage);
-        setWindowTitle(actionBalance->text());
-    }
-}
-
-void MainWindow::on_actionSettings_toggled(bool checked)
-{
-    if (checked) {
-        mainView->setCurrentWidget(settingsPage);
-        setWindowTitle(actionSettings->text());
-    }
 }
 
 void MainWindow::displayTimeAtWork()
@@ -216,45 +136,43 @@ void MainWindow::displayTimeAtWork()
         elapsedTimeText->setText(s);
 }
 
-void MainWindow::displayBalance()
-{	
-        double b = worker.balanceInProgress();
-	if (showBalanceInHours) {
-                b = b / 3600.0;
-	}
-	else {
-                b = b / (double)worker.workdayLength();
-	}
-        balanceEdit->setValue(b);
-}
-
 void MainWindow::reset()
 {
     qDebug() << "Reset";
 
     undoStack->push(new ClearAllCommand(this, worker, timer));
-
 }
 
-void MainWindow::on_exitOptionComboBox_currentIndexChanged(int option)
+
+
+void MainWindow::on_balanceButton_clicked()
 {
-    exitOption = option;
+    if (!m_balanceWindow) {
+        m_balanceWindow = new BalanceWindow(undoStack, &worker, this);
+        m_balanceWindow->setAttribute(Qt::WA_Maemo5StackedWindow);
+        m_balanceWindow->setWindowFlags(m_balanceWindow->windowFlags() | Qt::Window);
+
+        connect(timer, SIGNAL(timeout()), m_balanceWindow, SLOT(showBalance()));
+    }
+    m_balanceWindow->show();
 }
 
-void MainWindow::on_workdaySpinBox_editingFinished()
+void MainWindow::on_settingsButton_clicked()
 {
-    worker.setWorkdayLength(workdaySpinBox->value() * 3600);
-    updateView();
+    if (!m_preferencesWindow) {
+        m_preferencesWindow = new PreferencesWindow(m_preferences, &worker, this);
+        m_preferencesWindow->setAttribute(Qt::WA_Maemo5StackedWindow);
+        m_preferencesWindow->setWindowFlags(m_preferencesWindow->windowFlags() | Qt::Window);
+
+        connect(m_preferencesWindow, SIGNAL(alarmToggled(bool)),
+                this, SLOT(toggleAlarm(bool)));
+    }
+    m_preferencesWindow->show();
 }
 
 void MainWindow::save()
 {
-    QSettings settings(ORG_ID, APP_NAME);
-
-    settings.setValue("useAlarm", useAlarm);
-    settings.setValue("checkoutOnExit", exitOption);
-    settings.setValue("defaultExitDialogOption", defaultExitDialogOption);
-
+    m_preferences->save();
     QFile file(SAVEFILE);
     if (!file.open(QIODevice::WriteOnly)) {
         qDebug() << "Couldn't open savefile";
@@ -268,6 +186,8 @@ void MainWindow::save()
 
 void MainWindow::restore()
 {
+    m_preferences->load();
+
     QFile file(SAVEFILE);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "restore: no datafile";
@@ -278,18 +198,6 @@ void MainWindow::restore()
         in >> worker;
     }
     qDebug() << worker.print();
-
-    QSettings settings(ORG_ID, APP_NAME);
-
-    exitOption = settings.value("checkoutOnExit", 0).toInt();
-    exitOptionComboBox->setCurrentIndex(exitOption);
-    defaultExitDialogOption = settings.value("defaultExitDialogOption",
-                                             onExitCheckout).toInt();
-
-    useAlarm = settings.value("useAlarm", true).toBool();
-    alarmCheckBox->setChecked(useAlarm);
-
-    workdaySpinBox->setValue(worker.workdayLength() / 3600.0);
 }
 
 // If the user is checked in and wants to be asked what to do on exit, show the dialog,
@@ -299,9 +207,10 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     qDebug() << "Closing...";
     if (worker.isWorking()) {
-        if (exitOption == onExitAsk) {
+        if (m_preferences->exitOption() == Preferences::onExitAsk) {
             ExitDialog dialog(this);
-            if (defaultExitDialogOption == onExitCheckout) {
+            if (m_preferences->defaultExitDialogOption() ==
+                Preferences::onExitCheckout) {
                 dialog.checkoutOption->setChecked(true);
             }
             else {
@@ -311,22 +220,23 @@ void MainWindow::closeEvent(QCloseEvent* event)
                 int choice;
                 if (dialog.checkoutOption->isChecked()) {
                     on_checkInToggle_clicked();
-                    choice = onExitCheckout;
+                    choice = Preferences::onExitCheckout;
                 }
                 else {
-                    choice = onExitStayCheckedIn;
+                    choice = Preferences::onExitStayCheckedIn;
                 }
                 if (dialog.checkBox->isChecked()) {
-                    exitOption = choice;
+                    m_preferences->setExitOption(choice);
                 }
-                defaultExitDialogOption = choice;
+                m_preferences->setDefaultExitDialogOption(choice);
             }
             else {
                 event->ignore();
                 return;
             }
         }
-        else if (exitOption == onExitCheckout) {
+        else if (m_preferences->exitOption() ==
+                 Preferences::onExitCheckout) {
             on_checkInToggle_clicked();
         }
     }
@@ -363,23 +273,21 @@ void MainWindow::removeAlarm()
     if (alarm) alarm->remove();
 }
 
-void MainWindow::on_alarmCheckBox_toggled(bool b)
+void MainWindow::Activate()
 {
-    useAlarm = b;
+    activateWindow();
+}
 
+void MainWindow::toggleAlarm(bool b)
+{
     if (worker.isWorking()) {
-        if (useAlarm) {
+        if (b) {
             setAlarm();
         }
         else {
             removeAlarm();
         }
     }
-}
-
-void MainWindow::Activate()
-{
-    activateWindow();
 }
 
 Alarm* MainWindow::createAlarm()
@@ -394,12 +302,12 @@ Alarm* MainWindow::createAlarm()
     assert(alarmIds.count() <=1);
 
     if (alarmIds.count() == 1) {
-        assert(worker.isWorking() && useAlarm);
+        assert(worker.isWorking() && m_preferences->useAlarm());
         a = new Maemo5Alarm(alarmIds.first());
         qDebug() << "existing alarm loaded, id " << alarmIds.first();
     }
     else {
-        assert(!(worker.isWorking() && !worker.isOvertime())|| !useAlarm);
+        assert(!(worker.isWorking() && !worker.isOvertime())|| !m_preferences->useAlarm());
         a = new Maemo5Alarm(APP_ID);
         a->addDismissAction("Dismiss");
         a->addSnoozeAction("Remind me later");

@@ -27,6 +27,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtDebug>
 
 #include "mainwindow.h"
+#include "balancewindow.h"
 #include "commands.h"
 
 // Check In
@@ -98,22 +99,25 @@ void CheckoutCommand::undo()
 
 // Edit Balance
 
-EditBalanceCommand::EditBalanceCommand(MainWindow* ui, int newb, int oldb)
-    : ui_(ui), newBalance_(newb), oldBalance_(oldb)
+EditBalanceCommand::EditBalanceCommand(BalanceWindow* w, int newBalance, Worker *worker)
+    : m_window(w), m_newBalance(newBalance), m_worker(worker)
 {
     setText("Edit Balance");
+    m_oldBalance = m_worker->balance();
 }
 
 void EditBalanceCommand::redo()
 {
-    qDebug() << "Edit Balance/redo: " << newBalance_;
-    ui_->setBalance(newBalance_);
+    qDebug() << "Edit Balance/redo: " << m_newBalance;
+    m_worker->setBalance(m_newBalance);
+    m_window->showBalance();
 }
 
 void EditBalanceCommand::undo()
 {
-    qDebug() << "Edit Balance/undo: " << oldBalance_;
-    ui_->setBalance(oldBalance_);
+    qDebug() << "Edit Balance/undo: " << m_oldBalance;
+    m_worker->setBalance(m_oldBalance);
+    m_window->showBalance();
 }
 
 // Clear All

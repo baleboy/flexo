@@ -13,17 +13,27 @@ HEADERS += mainwindow.h \
     exitdialog.h \
     alarm.h \
     testalarm.h \
-    dbusifadaptor.h
+    dbusifadaptor.h \
+    balancewindow.h \
+    preferenceswindow.h \
+    constants.h \
+    preferences.h
 
 FORMS += mainwindow.ui \
-    exitdialog.ui
+    exitdialog.ui \
+    balancewindow.ui \
+    preferenceswindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     worker.cpp \
     commands.cpp \
     exitdialog.cpp \
     testalarm.cpp \
-    dbusifadaptor.cpp
+    dbusifadaptor.cpp \
+    balancewindow.cpp \
+    preferenceswindow.cpp \
+    constants.cpp \
+    preferences.cpp
 
 RESOURCES += \
     resources.qrc
@@ -55,4 +65,3 @@ unix {
     icon64.path = $$DATADIR/icons/hicolor/64x64/apps
     icon64.files += images/flexo.png
  }
-

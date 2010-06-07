@@ -23,6 +23,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtDBus/QDBusConnection>
 #include "mainwindow.h"
 #include "dbusifadaptor.h"
+#include "constants.h"
 
 int main(int argc, char **argv)
 {
@@ -33,8 +34,8 @@ int main(int argc, char **argv)
     new DBusIfAdaptor(&MainWindow);
 
     QDBusConnection connection = QDBusConnection::sessionBus();
-    bool ret = connection.registerService(MainWindow::APP_ID);
-    ret = connection.registerObject(MainWindow::DBUS_PATH, &MainWindow);
+    bool ret = connection.registerService(APP_ID);
+    ret = connection.registerObject(DBUS_PATH, &MainWindow);
 
     return app.exec();
 }
