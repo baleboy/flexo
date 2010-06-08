@@ -11,23 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>You are still checked in!</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>You are still checked in!</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <widget class="QLabel" name="label_2">
      <property name="font">
@@ -37,6 +23,9 @@
      </property>
      <property name="text">
       <string>What would you like to do?</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

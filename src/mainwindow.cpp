@@ -36,6 +36,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "preferenceswindow.h"
 #include "constants.h"
 #include "preferences.h"
+#include "timedialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
         : QMainWindow(parent), alarm(0), m_balanceWindow(0)
@@ -321,4 +322,23 @@ Alarm* MainWindow::createAlarm()
     a->setMessage("It's time to go home!");
 
     return a;
+}
+
+void MainWindow::on_checkInText_clicked()
+{
+    TimeDialog dialog(this);
+    QDateTime* dateTime;
+
+    if (worker.isWorking())
+        dialog.dateTimeEdit->setDateTime(*worker.lastCheckin());
+    else
+        dialog.dateTimeEdit->setDateTime(*worker.lastCheckout());
+
+    if (dialog.exec()) {
+        if (worker.isWorking())
+            worker.updateCheckinTime(dialog.dateTimeEdit->dateTime());
+        else
+            worker.updateCheckoutTime(dialog.dateTimeEdit->dateTime());
+        updateView();
+        }
 }

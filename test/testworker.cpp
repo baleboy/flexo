@@ -40,6 +40,7 @@ private slots:
     void testNeverCheckedin();
     void testSerialization();
     void testPrint();
+    void testUpdateCheckin();
 };
 
 void TestWorker::testConstructor()
@@ -359,6 +360,47 @@ void TestWorker::testPrint()
     w.checkin();
 
     qDebug() << w.print();
+}
+
+void TestWorker::testUpdateCheckin()
+{
+    Worker w;
+
+    int workday = 3600*7.5;
+    w.setWorkdayLength(workday);
+    QDateTime checkinTime = QDateTime::fromString("M1d1y201011:01:02",
+                                                  "'M'M'd'd'y'yyyyhh:mm:ss");
+    clock_ = checkinTime;
+
+    w.checkin();
+
+    checkinTime = checkinTime.addSecs(-300);
+
+    QVERIFY(w.updateCheckinTime(checkinTime) == 0);
+    QCOMPARE(double(w.balance()), -(3600*7.5));
+    QCOMPARE(double(w.balanceInProgress()), -(3600*7.5) + 300);
+    QCOMPARE(*w.lastCheckin(), checkinTime);
+
+    checkinTime = checkinTime.addSecs(600);
+
+    QVERIFY(w.updateCheckinTime(checkinTime) == 0);
+    QCOMPARE(double(w.balance()), -(3600*7.5));
+    QCOMPARE(double(w.balanceInProgress()), -(3600*7.5) - 300);
+    QCOMPARE(*w.lastCheckin(), checkinTime);
+
+    clock_ = clock_.addSecs(1000);
+    w.checkout();
+
+    QCOMPARE(w.balance(), w.balanceInProgress());
+    QCOMPARE(double(w.balance()), -(3600*7.5) + 700);
+
+    QVERIFY(w.updateCheckoutTime(checkinTime.addSecs(-300)) == -1);
+    QCOMPARE(double(w.balance()), -(3600*7.5) + 700);
+
+    QDateTime checkoutTime = clock_.addSecs(-300);
+    QVERIFY(w.updateCheckoutTime(checkoutTime) == 0);
+    QCOMPARE(double(w.balance()), -(3600*7.5) + 400);
+
 }
 
 QTEST_MAIN(TestWorker)

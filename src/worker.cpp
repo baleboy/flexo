@@ -75,7 +75,7 @@ QDateTime Worker::checkin()
     }
     else {
         if (!lastCheckin_) {
-            lastCheckin_ = new QDateTime(CURRENT_TIME);
+            lastCheckin_ = new QDateTime();
             firstCheckin = true;
         }
         QDateTime now = CURRENT_TIME;
@@ -129,7 +129,7 @@ int Worker::checkout()
     working_ = false;
 
     if (!lastCheckout_) {
-        lastCheckout_ = new QDateTime;
+        lastCheckout_ = new QDateTime();
     }
     *lastCheckout_ = t;
 
@@ -178,23 +178,60 @@ const QDateTime* Worker::lastCheckout() const
 ///////////////////////////////////////////////////////////////////////////////
 void Worker::setLastCheckin(const QDateTime& d)
 {
-    if (!lastCheckin_) {
+    if (!lastCheckin_)
         lastCheckin_ = new QDateTime(d);
-    }
-    else {
+    else
         *lastCheckin_ = d;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void Worker::setLastCheckout(const QDateTime& d)
 {
+    if (!lastCheckout_)
+        lastCheckout_ = new QDateTime(d);
+    else
+        *lastCheckout_ = d;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int Worker::updateCheckinTime(const QDateTime& d)
+{
+    if (lastCheckout_) {
+        if (((d > *lastCheckout_) && !working_) ||
+            ((d < *lastCheckout_) && working_)) {
+            return -1;
+        }
+    }
+
+    if (!lastCheckin_) {
+        lastCheckin_ = new QDateTime(d);
+    }
+    else {
+        if (!working_) {
+            balance_ += d.secsTo(*lastCheckin_);
+        }
+        *lastCheckin_ = d;
+    }
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int Worker::updateCheckoutTime(const QDateTime& d)
+{
+    if (lastCheckin_) {
+        if (((d < *lastCheckin_) && !working_) ||
+            ((d > *lastCheckin_) && working_)) {
+            return -1;
+        }
+    }
     if (!lastCheckout_) {
         lastCheckout_ = new QDateTime(d);
     }
     else {
+        balance_ -= d.secsTo(*lastCheckout_);
         *lastCheckout_ = d;
     }
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

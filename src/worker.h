@@ -141,8 +141,25 @@ public:
 
     QString print() const;
 
+    /*!
+     * Update time of last checkin. If the worker is not working,
+     * this modified the current balance.
+     *
+     * Returns -1 if the worker is not working and the checkin time
+     * is greater than the checkout time, 0 otherwise.
+     */
+    int updateCheckinTime(const QDateTime&);
+
+    /*!
+     * Update time of last checkout, and update the current balance
+     * accordingly.
+     *
+     * Returns -1 if the checkout time is less than the checkin time,
+     * 0 otherwise.
+     */
+    int updateCheckoutTime(const QDateTime&);
+
     // assorted accessor methods generally used at initialization and when storing state
-    // (probably would make sense to have state saving functions instead)
     void setLastCheckin(const QDateTime&);
     void setLastCheckout(const QDateTime&);
     int workdayLength() const;

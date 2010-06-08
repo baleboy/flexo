@@ -24,7 +24,4 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 ExitDialog::ExitDialog(QWidget* parent)
 {
     setupUi(this);
-
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
