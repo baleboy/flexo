@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget* parent)
     updateView();
 
     this->show();
+
+    qDebug() << "Datafile: " << SAVEFILE;
 }
 
 void MainWindow::updateView()
@@ -328,7 +330,6 @@ Alarm* MainWindow::createAlarm()
 void MainWindow::on_checkInText_clicked()
 {
     TimeDialog dialog(this);
-    QDateTime* dateTime;
 
     if (worker.isWorking())
         dialog.dateTimeEdit->setDateTime(*worker.lastCheckin());
