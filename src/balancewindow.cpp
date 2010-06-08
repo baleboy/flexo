@@ -16,7 +16,7 @@ void BalanceWindow::on_balanceEdit_editingFinished()
 {
     int newValue;
     if (balanceUnitSelector->currentIndex() == 0)
-        newValue = int(balanceEdit->value()) * 3600;
+        newValue = int(balanceEdit->value() * 3600.0);
     else
         newValue = int(balanceEdit->value()) * m_worker->workdayLength();
 
