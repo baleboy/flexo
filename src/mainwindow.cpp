@@ -92,9 +92,10 @@ void MainWindow::updateView()
 
     if (showText) {
         checkInText->setText(textBuffer);
+        checkInText->show();
     }
     else {
-        checkInText->setText("");
+        checkInText->hide();
     }
     displayTimeAtWork();
 }
