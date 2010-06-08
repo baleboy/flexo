@@ -10,6 +10,8 @@ BalanceWindow::BalanceWindow(QUndoStack *u, Worker* w, QWidget *parent) :
 {
     setupUi(this);
     balanceUnitSelector->setCurrentIndex(0);
+    connect(balanceUnitSelector, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(showBalance()));
 }
 
 void BalanceWindow::on_balanceEdit_editingFinished()
