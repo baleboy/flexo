@@ -1,4 +1,5 @@
 #include <QUndoStack>
+#include <QtDebug>
 
 #include "balancewindow.h"
 #include "commands.h"
@@ -24,6 +25,7 @@ void BalanceWindow::on_balanceEdit_editingFinished()
 
     if (newValue != m_worker->balance())
         m_undoStack->push(new EditBalanceCommand(this, newValue, m_worker));
+
 }
 
 void BalanceWindow::showBalance()
@@ -36,6 +38,8 @@ void BalanceWindow::showBalance()
                 double(m_worker->workdayLength());
     balanceEdit->setValue(value);
     balanceEdit->setDisabled(m_worker->isWorking());
+
+    qDebug() << "balance: " << value;
 }
 
 void BalanceWindow::showEvent(QShowEvent *event)

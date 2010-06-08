@@ -123,7 +123,7 @@ void MainWindow::onTimer()
 void MainWindow::displayTimeAtWork()
 {
 	QString s;
-        int done = worker.workDoneToday() + worker.workInProgress();
+        int done = abs(worker.workdayLength() - worker.workDoneToday() - worker.workInProgress());
         qDebug() << "done: " << done;
 
         // TODO: add some checks to avoid repeating this at every tick
