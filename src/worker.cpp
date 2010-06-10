@@ -228,7 +228,9 @@ int Worker::updateCheckoutTime(const QDateTime& d)
         lastCheckout_ = new QDateTime(d);
     }
     else {
-        balance_ -= d.secsTo(*lastCheckout_);
+        int delta = d.secsTo(*lastCheckout_);
+        balance_ -= delta;
+        workDoneToday_ -= delta;
         *lastCheckout_ = d;
     }
     return 0;

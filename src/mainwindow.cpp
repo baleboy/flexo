@@ -309,7 +309,6 @@ Alarm* MainWindow::createAlarm()
     assert(alarmIds.count() <=1);
 
     if (alarmIds.count() == 1) {
-        assert(worker.isWorking() && m_preferences->useAlarm());
         a = new Maemo5Alarm(alarmIds.first());
         qDebug() << "existing alarm loaded, id " << alarmIds.first();
     }
@@ -345,9 +344,11 @@ void MainWindow::on_checkInText_clicked()
             return;
         }
         if (worker.isWorking()) {
-            if (dialog.dateTimeEdit->dateTime() < *worker.lastCheckout()) {
-                showWarning("Checkin time cannot be earlier than last checkout");
-                return;
+            if (worker.lastCheckout()) {
+                if (dialog.dateTimeEdit->dateTime() < *worker.lastCheckout()) {
+                    showWarning("Checkin time cannot be earlier than last checkout");
+                    return;
+                }
             }
             worker.updateCheckinTime(dialog.dateTimeEdit->dateTime());
             setAlarm();
