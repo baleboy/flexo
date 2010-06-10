@@ -341,7 +341,7 @@ void MainWindow::on_checkInText_clicked()
 
     if (dialog.exec()) {
         if (dialog.dateTimeEdit->dateTime() > QDateTime::currentDateTime()) {
-            showWarning("New time cannot be in the future);
+            showWarning("New time cannot be in the future");
             return;
         }
         if (worker.isWorking()) {
