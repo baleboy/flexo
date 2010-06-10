@@ -81,6 +81,8 @@ private:
     void save();
     void restore();
     void createUndoActions();
+    void showWarning(const QString&);
+
     Alarm* createAlarm();
 
     QUndoStack *undoStack;

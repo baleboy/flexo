@@ -25,6 +25,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSettings>
 #include <QtDebug>
 #include <assert.h>
+#include <QMaemo5InformationBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -60,7 +61,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     restore();
 
-    alarm = createAlarm();
+    if (m_preferences->useAlarm()) {
+        alarm = createAlarm();
+    }
 
     updateView();
 
@@ -337,10 +340,30 @@ void MainWindow::on_checkInText_clicked()
         dialog.dateTimeEdit->setDateTime(*worker.lastCheckout());
 
     if (dialog.exec()) {
-        if (worker.isWorking())
-            worker.updateCheckinTime(dialog.dateTimeEdit->dateTime());
-        else
-            worker.updateCheckoutTime(dialog.dateTimeEdit->dateTime());
-        updateView();
+        if (dialog.dateTimeEdit->dateTime() > QDateTime::currentDateTime()) {
+            showWarning("New time cannot be in the future);
+            return;
         }
+        if (worker.isWorking()) {
+            if (dialog.dateTimeEdit->dateTime() < *worker.lastCheckout()) {
+                showWarning("Checkin time cannot be earlier than last checkout");
+                return;
+            }
+            worker.updateCheckinTime(dialog.dateTimeEdit->dateTime());
+            setAlarm();
+        }
+        else {
+            if (dialog.dateTimeEdit->dateTime() < *worker.lastCheckin()) {
+                showWarning("Checkout time cannot be earlier than last checkin");
+                return;
+            }
+            worker.updateCheckoutTime(dialog.dateTimeEdit->dateTime());
+        }
+        updateView();
+    }
+}
+
+void MainWindow::showWarning(const QString &msg)
+{
+    QMaemo5InformationBox::information(this, msg);
 }

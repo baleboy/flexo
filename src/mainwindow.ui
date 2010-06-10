@@ -20,23 +20,7 @@
    <string>Flexo</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolButton {
-
-	margin-bottom: 20 px;
-	margin-top: 20 px;
-	padding-left: 10 px;
-	padding-right: 10 px;
-	padding-top: 10 px;
-	padding-bottom: 10 px;
-	font: 14px;
-	color: gray;
-   	border-width: 1px;
-  border-radius: 7px;
-}
-
-QToolButton:pressed, QToolButton:checked {
-	color: white;
-} 
+   <string notr="true">
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -113,7 +97,7 @@ border-image: url(:/images/checkout-button.png);
 
 QPushButton:pressed {
     border-style: inset;
-}
+} 
 </string>
         </property>
         <property name="text">
