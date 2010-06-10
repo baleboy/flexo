@@ -1,3 +1,12 @@
+flexo (0.2-1) unstable; urgency=low
+
+  * UI uses Maemo stacked windows
+  * Clock counts down during normal hours, counts up while in overtime
+  * Added datafile
+  * Checkin and checkout times can be modified
+
+ -- Francesco Balestrieri <bale@balenet.com> Thu, 10 Jun 2010 16:28:00 +0300
+
 flexo (0.1-1) unstable; urgency=low
 
   * Initial release 
