@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     updateView();
 
+    if (worker.isWorking())
+        timer->start();
+
     this->show();
 
     qDebug() << "Datafile: " << SAVEFILE;
