@@ -1,3 +1,12 @@
+flexo (0.2-2) unstable; urgency=low
+
+  * Bug fixes
+  * Converted various buttons to Maemo5-style pickers
+  * Screen unlocks when the alarm goes off and user goes to check out
+  * Added a configuration option to prevent the above (for security)
+
+ -- Francesco Balestrieri <bale@balenet.com> Sat, 12 Jun 2010 20:34:00 +0300
+
 flexo (0.2-1) unstable; urgency=low
 
   * UI uses Maemo stacked windows
