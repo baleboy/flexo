@@ -16,13 +16,13 @@ public:
 
 signals:
     void alarmToggled(bool);
+    void workdayUpdated();
 
 public slots:
     void on_workdaySpinBox_editingFinished();
-    void on_exitOptionComboBox_currentIndexChanged(int);
     void on_alarmCheckBox_toggled(bool b);
     void on_unlockCheckBox_toggled(bool b);
-
+    void changeExitOption();
 
 private:
     Worker* m_worker;

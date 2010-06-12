@@ -14,10 +14,7 @@
    <string>Preferences</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">PreferencesWindow {
-	margin-left: 50px;
-	margin-right: 50px;
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
@@ -32,58 +29,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>If closing while checked in:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QComboBox" name="exitOptionComboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <item>
-        <property name="text">
-         <string>ask what to do</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>check out</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>stay checked in</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item row="2" column="0">
     <spacer name="horizontalSpacer">
@@ -145,21 +90,21 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="1">
+   <item row="4" column="1">
     <widget class="QCheckBox" name="alarmCheckBox">
      <property name="text">
       <string>Ring alarm when it's time to quit</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QCheckBox" name="unlockCheckBox">
      <property name="text">
       <string>Unlock screen when alarm rings</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="6" column="1">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -172,8 +117,22 @@
      </property>
     </spacer>
    </item>
+   <item row="3" column="1">
+    <widget class="QMaemo5ValueButton" name="exitOptionButton">
+     <property name="text">
+      <string>If closing while checked in: </string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QMaemo5ValueButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">qmaemo5valuebutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

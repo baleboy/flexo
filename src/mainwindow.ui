@@ -20,8 +20,7 @@
    <string>Flexo</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -179,6 +178,10 @@ QPushButton:pressed {
       </property>
       <property name="text">
        <string>PushButton</string>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/images/clock.png</normaloff>:/images/clock.png</iconset>
       </property>
      </widget>
     </item>
