@@ -130,7 +130,10 @@ void MainWindow::onTimer()
 void MainWindow::displayTimeAtWork()
 {
 	QString s;
-        int done = abs(worker.workdayLength() - worker.workDoneToday() - worker.workInProgress());
+
+        int todo = worker.isHoliday() ? 0 : worker.workdayLength();
+        int done = abs(todo - worker.workDoneToday() - worker.workInProgress());
+
         qDebug() << "done: " << done;
 
         // TODO: add some checks to avoid repeating this at every tick
