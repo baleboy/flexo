@@ -20,7 +20,7 @@
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2">
+   <item row="0" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -34,39 +34,56 @@
     </spacer>
    </item>
    <item row="1" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>If exiting while checked in:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QComboBox" name="exitOptionComboBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <property name="text">
-       <string>ask what to do</string>
-      </property>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>If closing while checked in:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
      </item>
      <item>
-      <property name="text">
-       <string>check out</string>
-      </property>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
-      <property name="text">
-       <string>stay checked in</string>
-      </property>
+      <widget class="QComboBox" name="exitOptionComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>ask what to do</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>check out</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>stay checked in</string>
+        </property>
+       </item>
+      </widget>
      </item>
-    </widget>
+    </layout>
    </item>
    <item row="2" column="0">
     <spacer name="horizontalSpacer">
@@ -82,23 +99,40 @@
     </spacer>
    </item>
    <item row="2" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Working day in hours:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Working day in hours:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="workdaySpinBox">
+       <property name="decimals">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="2" column="3">
-    <widget class="QDoubleSpinBox" name="workdaySpinBox">
-     <property name="decimals">
-      <number>1</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
+   <item row="2" column="2">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -112,23 +146,20 @@
     </spacer>
    </item>
    <item row="3" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Alarm when it's time to quit:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
     <widget class="QCheckBox" name="alarmCheckBox">
      <property name="text">
-      <string/>
+      <string>Ring alarm when it's time to quit</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
+   <item row="4" column="1">
+    <widget class="QCheckBox" name="unlockCheckBox">
+     <property name="text">
+      <string>Unlock screen when alarm rings</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

@@ -9,6 +9,7 @@ PreferencesWindow::PreferencesWindow(Preferences* p, Worker* w, QWidget *parent)
     workdaySpinBox->setValue(double(m_worker->workdayLength()) / 3600.0);
     alarmCheckBox->setChecked(m_preferences->useAlarm());
     exitOptionComboBox->setCurrentIndex(m_preferences->exitOption());
+    unlockCheckBox->setChecked(m_preferences->unlockScreen());
 }
 
 void PreferencesWindow::on_workdaySpinBox_editingFinished()
@@ -25,4 +26,9 @@ void PreferencesWindow::on_alarmCheckBox_toggled(bool b)
 {
     m_preferences->setUseAlarm(b);
     emit alarmToggled(b);
+}
+
+void PreferencesWindow::on_unlockCheckBox_toggled(bool b)
+{
+    m_preferences->setUnlockScreen(b);
 }

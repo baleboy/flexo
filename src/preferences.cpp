@@ -5,7 +5,7 @@
 
 Preferences::Preferences()
     : m_useAlarm(true), m_exitOption(onExitAsk),
-    m_defaultExitDialogOption(onExitCheckout)
+    m_defaultExitDialogOption(onExitCheckout), m_unlockScreen(true)
 {
 }
 
@@ -17,6 +17,7 @@ void Preferences::load()
     m_defaultExitDialogOption = settings.value("defaultExitDialogOption",
                                                onExitCheckout).toInt();
     m_useAlarm = settings.value("useAlarm", true).toBool();
+    m_unlockScreen = settings.value("unlockScreen", true).toBool();
 }
 
 void Preferences::save()
@@ -26,4 +27,5 @@ void Preferences::save()
     settings.setValue("useAlarm", m_useAlarm);
     settings.setValue("checkoutOnExit", m_exitOption);
     settings.setValue("defaultExitDialogOption", m_defaultExitDialogOption);
+    settings.setValue("unlockScreen", m_unlockScreen);
 }

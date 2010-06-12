@@ -26,6 +26,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtDebug>
 #include <assert.h>
 #include <QMaemo5InformationBox>
+#include <QDBusInterface>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -285,6 +286,14 @@ void MainWindow::removeAlarm()
 
 void MainWindow::Activate()
 {
+    // unlock screen if allowed
+    if (m_preferences->unlockScreen()) {
+        QDBusInterface mce( "com.nokia.mce", "/com/nokia/mce/request",
+                              "com.nokia.mce.request", QDBusConnection::systemBus() );
+        mce.call( "req_tklock_mode_change", "unlocked");
+    }
+
+    // bring window to the foreground
     activateWindow();
 }
 
