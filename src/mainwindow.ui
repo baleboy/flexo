@@ -172,7 +172,7 @@ QPushButton:pressed {
      </spacer>
     </item>
     <item row="4" column="2">
-     <widget class="QPushButton" name="checkInText">
+     <widget class="QMaemo5ValueButton" name="checkInText">
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -273,6 +273,13 @@ QPushButton:pressed {
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QMaemo5ValueButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">qmaemo5valuebutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

@@ -127,7 +127,6 @@ void Maemo5Alarm::addDBusAction(const QString& text, const QString& service,
     alarm_action_set_dbus_interface(action, interface.toAscii().constData());
     alarm_action_set_dbus_service(action, service.toAscii().constData());
     alarm_action_set_dbus_path(action, path.toAscii().constData());
-    // TODO: figure out what name should be there
     alarm_action_set_dbus_name(action, name.toAscii().constData());
 }
 

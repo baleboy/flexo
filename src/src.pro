@@ -17,14 +17,12 @@ HEADERS += mainwindow.h \
     balancewindow.h \
     preferenceswindow.h \
     constants.h \
-    preferences.h \
-    timedialog.h
+    preferences.h
 
 FORMS += mainwindow.ui \
     exitdialog.ui \
     balancewindow.ui \
-    preferenceswindow.ui \
-    timedialog.ui
+    preferenceswindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     worker.cpp \
@@ -35,8 +33,7 @@ SOURCES += main.cpp \
     balancewindow.cpp \
     preferenceswindow.cpp \
     constants.cpp \
-    preferences.cpp \
-    timedialog.cpp
+    preferences.cpp
 
 RESOURCES += \
     resources.qrc

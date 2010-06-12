@@ -57,7 +57,8 @@ private slots:
     void on_checkInToggle_clicked();
     void on_balanceButton_clicked();
     void on_settingsButton_clicked();
-    void on_checkInText_clicked();
+
+    void updateTime();
 
     void toggleAlarm(bool);
 
