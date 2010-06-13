@@ -91,6 +91,8 @@ void MainWindow::updateView()
     // setting the time value programmatically will trigger a signal
     sel->blockSignals(true);
 
+    bool showText = false;
+
     if (worker.isWorking()) {
         checkInToggle->setChecked(true);
         if (worker.lastCheckin()) {
