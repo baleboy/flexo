@@ -49,7 +49,8 @@ MainWindow::MainWindow(QWidget* parent)
     QMaemo5TimePickSelector *sel = new QMaemo5TimePickSelector;
     checkInText->setPickSelector(sel);
     checkInText->setValueLayout(QMaemo5ValueButton::ValueBesideText);
-    connect(sel, SIGNAL(selected(QString)), this, SLOT(updateTime()));
+    // connect(sel, SIGNAL(selected(QString)), this, SLOT(updateTime()));
+    connect(checkInText, SIGNAL(clicked()), this, SLOT(updateTime()));
 
     QAction *actionReset = new QAction(tr("Clear All"), this);
     menuBar()->addAction(actionReset);
@@ -87,10 +88,6 @@ void MainWindow::updateView()
     QMaemo5TimePickSelector *sel =
             qobject_cast<QMaemo5TimePickSelector *>(checkInText->pickSelector());
 
-    // blocking time picker signals during this method call, otherwise
-    // setting the time value programmatically will trigger a signal
-    sel->blockSignals(true);
-
     bool showText = false;
 
     if (worker.isWorking()) {
@@ -117,8 +114,6 @@ void MainWindow::updateView()
         checkInText->hide();
     }
     displayTimeAtWork();
-
-    sel->blockSignals(false);
 }
 
 void MainWindow::on_checkInToggle_clicked()
