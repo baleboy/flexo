@@ -1,3 +1,11 @@
+flexo (0.2-3) unstable; urgency=low
+
+  * Converted balance unit selector to Maemo5-style picker
+  * Selected balance unit is now remembered across restarts
+  * Editing checkin and checkout time can be undone
+
+ -- Francesco Balestrieri <bale@balenet.com>  Sun, 13 Jun 2010 09:16:00 +0300
+
 flexo (0.2-2) unstable; urgency=low
 
   * Bug fixes
@@ -5,7 +13,7 @@ flexo (0.2-2) unstable; urgency=low
   * Screen unlocks when the alarm goes off and user goes to check out
   * Added a configuration option to prevent the above (for security)
 
- -- Francesco Balestrieri <bale@balenet.com> Sat, 12 Jun 2010 20:34:00 +0300
+ -- Francesco Balestrieri <bale@balenet.com>  Sat, 12 Jun 2010 20:34:00 +0300
 
 flexo (0.2-1) unstable; urgency=low
 
@@ -14,7 +22,7 @@ flexo (0.2-1) unstable; urgency=low
   * Added datafile
   * Checkin and checkout times can be modified
 
- -- Francesco Balestrieri <bale@balenet.com> Thu, 10 Jun 2010 16:28:00 +0300
+ -- Francesco Balestrieri <bale@balenet.com>  Thu, 10 Jun 2010 16:28:00 +0300
 
 flexo (0.1-1) unstable; urgency=low
 
