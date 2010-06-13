@@ -165,7 +165,7 @@ void MainWindow::reset()
 void MainWindow::on_balanceButton_clicked()
 {
     if (!m_balanceWindow) {
-        m_balanceWindow = new BalanceWindow(undoStack, &worker, this);
+        m_balanceWindow = new BalanceWindow(undoStack, &worker, m_preferences, this);
         m_balanceWindow->setAttribute(Qt::WA_Maemo5StackedWindow);
         m_balanceWindow->setWindowFlags(m_balanceWindow->windowFlags() | Qt::Window);
 

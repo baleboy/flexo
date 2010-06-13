@@ -27,20 +27,6 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="balanceUnitSelector">
-     <item>
-      <property name="text">
-       <string>Hours</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Days</string>
-      </property>
-     </item>
-    </widget>
-   </item>
    <item row="3" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -101,8 +87,22 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="1">
+    <widget class="QMaemo5ValueButton" name="balanceUnitButton">
+     <property name="text">
+      <string>Balance shown in</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QMaemo5ValueButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">qmaemo5valuebutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

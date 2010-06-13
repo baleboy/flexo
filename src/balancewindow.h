@@ -5,13 +5,14 @@
 
 class QUndoStack;
 class Worker;
+class Preferences;
 
 class BalanceWindow : public QWidget, private Ui::BalanceWindow
 {
     Q_OBJECT
 
 public:
-    explicit BalanceWindow(QUndoStack*, Worker*, QWidget *parent = 0);
+    explicit BalanceWindow(QUndoStack*, Worker*, Preferences*, QWidget *parent = 0);
 
 public slots:
 
@@ -26,8 +27,9 @@ private slots:
 
 private:
 
-    QUndoStack* m_undoStack;
-    Worker* m_worker;
+    QUndoStack *m_undoStack;
+    Worker *m_worker;
+    Preferences *m_preferences;
 };
 
 #endif // BALANCEWINDOW_H
