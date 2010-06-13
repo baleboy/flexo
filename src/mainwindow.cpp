@@ -70,7 +70,9 @@ MainWindow::MainWindow(QWidget* parent)
         alarm = createAlarm();
     }
 
+    qDebug() << "about to update view";
     updateView();
+    qDebug() << "view updated";
 
     if (worker.isWorking())
         timer->start();
@@ -82,9 +84,12 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::updateView()
 {
-    bool showText = false;
     QMaemo5TimePickSelector *sel =
             qobject_cast<QMaemo5TimePickSelector *>(checkInText->pickSelector());
+
+    // blocking time picker signals during this method call, otherwise
+    // setting the time value programmatically will trigger a signal
+    sel->blockSignals(true);
 
     if (worker.isWorking()) {
         checkInToggle->setChecked(true);
@@ -110,6 +115,8 @@ void MainWindow::updateView()
         checkInText->hide();
     }
     displayTimeAtWork();
+
+    sel->blockSignals(false);
 }
 
 void MainWindow::on_checkInToggle_clicked()
@@ -324,7 +331,6 @@ Alarm* MainWindow::createAlarm()
 
     QList<alarm_id_t> alarmIds;
     Maemo5Alarm::getAlarms(APP_ID, alarmIds);
-    qDebug() << "Found " << alarmIds.count() << " alarms";
 
     assert(alarmIds.count() <=1);
 
@@ -380,8 +386,7 @@ void MainWindow::updateTime()
                 return;
             }
         }
-        worker.updateCheckinTime(newDateTime);
-        setAlarm();
+        undoStack->push(new UpdateCheckinTimeCommand(this, newDateTime, worker));
     }
     else {
         if (newDateTime < *worker.lastCheckin()) {
@@ -389,9 +394,8 @@ void MainWindow::updateTime()
             sel->setCurrentTime(storedTime);
             return;
         }
-        worker.updateCheckoutTime(newDateTime);
+        undoStack->push(new UpdateCheckoutTimeCommand(this, newDateTime, worker));
     }
-    updateView();
 }
 
 void MainWindow::showWarning(const QString &msg)

@@ -143,3 +143,49 @@ void ClearAllCommand::undo()
         timer_->start();
     }
 }
+
+UpdateCheckinTimeCommand::UpdateCheckinTimeCommand(MainWindow* win, const QDateTime& t, Worker& w) :
+        m_window(win),
+        m_worker(w),
+        m_newDateTime(t),
+        m_oldDateTime(*w.lastCheckin())
+{
+    setText("Edit checkin time");
+}
+
+void UpdateCheckinTimeCommand::redo()
+{
+    m_worker.updateCheckinTime(m_newDateTime);
+    if (m_worker.isWorking())
+        m_window->setAlarm();
+    m_window->updateView();
+}
+
+void UpdateCheckinTimeCommand::undo()
+{
+   m_worker.updateCheckinTime(m_oldDateTime);
+    if (m_worker.isWorking())
+        m_window->setAlarm();
+   m_window->updateView();
+}
+
+UpdateCheckoutTimeCommand::UpdateCheckoutTimeCommand(MainWindow* win, const QDateTime& t, Worker& w) :
+        m_window(win),
+        m_worker(w),
+        m_newDateTime(t),
+        m_oldDateTime(*w.lastCheckout())
+{
+    setText("Edit checkout time");
+}
+
+void UpdateCheckoutTimeCommand::redo()
+{
+    m_worker.updateCheckoutTime(m_newDateTime);
+    m_window->updateView();
+}
+
+void UpdateCheckoutTimeCommand::undo()
+{
+    m_worker.updateCheckoutTime(m_oldDateTime);
+    m_window->updateView();
+}

@@ -23,6 +23,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #define COMMANDS_H
 
 #include <QUndoCommand>
+#include <QDateTime>
 
 #include "worker.h"
 
@@ -118,6 +119,34 @@ private:
     Worker oldWorker_;
     QTimer* timer_;
 
+};
+
+class UpdateCheckinTimeCommand : public QUndoCommand
+{
+public:
+    UpdateCheckinTimeCommand(MainWindow*, const QDateTime&, Worker&);
+    void undo();
+    void redo();
+private:
+
+    MainWindow* m_window;
+    Worker& m_worker;
+    QDateTime m_newDateTime;
+    QDateTime m_oldDateTime;
+};
+
+class UpdateCheckoutTimeCommand : public QUndoCommand
+{
+public:
+    UpdateCheckoutTimeCommand(MainWindow*, const QDateTime&, Worker&);
+    void undo();
+    void redo();
+private:
+
+    MainWindow* m_window;
+    Worker& m_worker;
+    QDateTime m_newDateTime;
+    QDateTime m_oldDateTime;
 };
 
 #endif // COMMANDS_H
