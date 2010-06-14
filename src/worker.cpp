@@ -34,13 +34,12 @@ QDateTime clock_;
 #endif
 
 #define DAY_IN_SECS (24*3600)
-#define DEFAULT_WORKDAY (3600*7.5)
 
 const QTime Worker::startTime_(QTime::fromString("05:00:00", "hh:mm:ss"));
 
 Worker::Worker()
     : working_(0), lastCheckin_(0), lastCheckout_(0), workDoneToday_(0),
-      workdayLength_(DEFAULT_WORKDAY), balance_(0), isHoliday_(false)
+      workdayLength_(0), balance_(0), isHoliday_(false)
 {
 }
 
@@ -351,7 +350,6 @@ void Worker::clear()
     }
 
     workDoneToday_ = 0;
-    workdayLength_ = DEFAULT_WORKDAY;
     balance_ = 0;
     isHoliday_ = false;
 }

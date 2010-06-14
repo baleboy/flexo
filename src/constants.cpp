@@ -1,7 +1,7 @@
 #include <QDir>
 #include "constants.h"
 
-const int DEFAULT_WORKDAY = 7.5*3600;
+const int DEFAULT_WORKDAY = 8.0*3600.0;
 const int TIMER_VALUE_IN_MSEC = 60000;
 
 const QString ORG_ID = "com.balenet";
