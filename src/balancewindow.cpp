@@ -3,6 +3,7 @@
 #include <QMaemo5ListPickSelector>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QShowEvent>
 
 #include "balancewindow.h"
 #include "commands.h"
@@ -69,4 +70,5 @@ void BalanceWindow::showBalance()
 void BalanceWindow::showEvent(QShowEvent *event)
 {
     showBalance();
+    event->accept();
 }

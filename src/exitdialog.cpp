@@ -21,7 +21,8 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "exitdialog.h"
 
-ExitDialog::ExitDialog(QWidget* parent)
+ExitDialog::ExitDialog(QWidget* parent) :
+        QDialog(parent)
 {
     setupUi(this);
 }

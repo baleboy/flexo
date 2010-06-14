@@ -70,7 +70,7 @@ void Maemo5Alarm::copy(const Maemo5Alarm& other)
 
     alarm_action_t *act, *other_act;
     if (other.m_data->action_cnt > 0) {
-         for (int i = 0 ; i < other.m_data->action_cnt ; ++i) {
+         for (quint32 i = 0 ; i < other.m_data->action_cnt ; ++i) {
              act = alarm_event_add_actions(m_data, 1);
              other_act = alarm_event_get_action(other.m_data, i);
              act->flags = other_act->flags;
