@@ -1,3 +1,11 @@
+flexo (0.2-4) unstable; urgency=low
+
+  * UI tweaks
+  * Default workday changed to 8 hours
+  * "Clear all" doesn't reset the workday length
+
+ -- Francesco Balestrieri <bale@balenet.com>  Mon, 14 Jun 2010 06:57:00 +0300
+
 flexo (0.2-3) unstable; urgency=low
 
   * Converted balance unit selector to Maemo5-style picker
