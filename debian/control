@@ -1,13 +1,13 @@
 Source: flexo
+Maintainer: Francesco Balestrieri <bale@balenet.com>
 Section: user/utilities
 Priority: optional
-Maintainer: Francesco Balestrieri <bale@balenet.com>
-Build-Depends: debhelper (>= 5), libqt4-dev
-Standards-Version: 3.7.3
-Homepage: http://gitorious.org/flexo
+Build-Depends: debhelper (>= 5), libqt4-dev, libalarm-dev
+Standards-Version: 3.7.2
 
 Package: flexo
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Simple time tracking application to keep track of flexitime
+Description: Simple time tracking application to keep track of flexi-time
+ Further information: http://www.balenet.com/flexo
 XB-Maemo-Display-Name: Flexo

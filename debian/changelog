@@ -1,3 +1,15 @@
+flexo (0.2-6) unstable; urgency=low
+
+  * Another attempt to get the control file right
+
+ -- Francesco Balestrieri <bale@balenet.com>  Tue, 15 Jun 2010 20:23:00 +0300
+
+flexo (0.2-5) unstable; urgency=low
+
+  * Trying to fix the description in the control file
+
+ -- Francesco Balestrieri <bale@balenet.com>  Tue, 15 Jun 2010 19:57:00 +0300
+
 flexo (0.2-4) unstable; urgency=low
 
   * UI tweaks
