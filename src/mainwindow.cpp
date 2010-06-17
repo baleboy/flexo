@@ -189,6 +189,8 @@ void MainWindow::on_settingsButton_clicked()
                 this, SLOT(toggleAlarm(bool)));
         connect(m_preferencesWindow, SIGNAL(workdayUpdated()),
                 this, SLOT(updateView()));
+        connect(m_preferencesWindow, SIGNAL(workdayUpdated()),
+                this, SLOT(setAlarm()));
     }
     m_preferencesWindow->show();
 }

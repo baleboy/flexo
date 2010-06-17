@@ -44,13 +44,12 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 public:
     MainWindow(QWidget *parent = 0);
 
-    void setAlarm();
-    void removeAlarm();
-
 public slots:
 
     void updateView();
     void Activate();
+    void setAlarm();
+    void removeAlarm();
 
 private slots:
 
