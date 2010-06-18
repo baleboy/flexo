@@ -50,7 +50,7 @@ void TestWorker::testConstructor()
 
     QVERIFY(out.workDoneToday() == 0);
     QVERIFY(!out.isWorking());
-    QVERIFY(out.workdayLength() == 3600*7.5);
+    QVERIFY(out.workdayLength() == 0);
 
     out.setBalance(5);
     out.checkin();
@@ -235,6 +235,7 @@ void TestWorker::testDayChange()
 void TestWorker::testNewDay()
 {
     Worker w;
+    w.setWorkdayLength(7.5*3600);
     clock_ = QDateTime::fromString("09:30", "hh:mm");
     w.checkin();
     clock_ = clock_.addSecs(3600);
@@ -266,6 +267,7 @@ void TestWorker::testWithRealClock()
 void TestWorker::testOvertime()
 {
     Worker w;
+    w.setWorkdayLength(7.5*3600);
 
     clock_ = QDateTime::fromString("M1d1y201011:01:02",
                                    "'M'M'd'd'y'yyyyhh:mm:ss");
