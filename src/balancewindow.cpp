@@ -16,8 +16,8 @@ BalanceWindow::BalanceWindow(QUndoStack *u, Worker *w,
 QWidget(parent),
 m_undoStack(u),
 m_worker(w),
-m_preferences(p)
-
+m_preferences(p),
+m_currentText("")
 {
     setupUi(this);
 
@@ -36,16 +36,18 @@ m_preferences(p)
 
 void BalanceWindow::on_balanceEdit_editingFinished()
 {
-    QMaemo5ListPickSelector *sel =
-            qobject_cast<QMaemo5ListPickSelector *>(balanceUnitButton->pickSelector());
-    int newValue;
-    if (sel->currentIndex() == 0)
-        newValue = int(balanceEdit->value() * 3600.0);
-    else
-        newValue = int(balanceEdit->value()) * m_worker->workdayLength();
-
-    if (newValue != m_worker->balance())
+    if (m_currentText != balanceEdit->text()) {
+        qDebug() << "Updating balance";
+        m_currentText = balanceEdit->text();
+        QMaemo5ListPickSelector *sel =
+                qobject_cast<QMaemo5ListPickSelector *>(balanceUnitButton->pickSelector());
+        int newValue;
+        if (sel->currentIndex() == 0)
+            newValue = int(balanceEdit->value() * 3600.0);
+        else
+            newValue = int(balanceEdit->value()) * m_worker->workdayLength();
         m_undoStack->push(new EditBalanceCommand(this, newValue, m_worker));
+    }
 }
 
 void BalanceWindow::showBalance()
@@ -60,7 +62,7 @@ void BalanceWindow::showBalance()
                 double(m_worker->workdayLength());
     balanceEdit->setValue(value);
     balanceEdit->setDisabled(m_worker->isWorking());
-
+    m_currentText = balanceEdit->text();
     if (sel->currentIndex() != m_preferences->balanceUnit())
         m_preferences->setBalanceUnit(sel->currentIndex());
 

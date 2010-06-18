@@ -30,6 +30,7 @@ private:
     QUndoStack *m_undoStack;
     Worker *m_worker;
     Preferences *m_preferences;
+    QString m_currentText;
 };
 
 #endif // BALANCEWINDOW_H
