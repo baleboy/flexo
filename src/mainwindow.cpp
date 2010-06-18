@@ -368,8 +368,14 @@ void MainWindow::updateTime()
         target = worker.lastCheckout();
 
     storedTime = target->time();
+
+    if (sel->currentTime() == storedTime)
+        return;
+
     newDateTime = *target;
     newDateTime.setTime(sel->currentTime());
+
+
 
     if (newDateTime > QDateTime::currentDateTime()) {
         showWarning("New time cannot be in the future");
