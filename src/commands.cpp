@@ -55,6 +55,7 @@ void CheckinCommand::redo()
     timer_->start();
     ui_->updateView();
     ui_->setAlarm();
+    ui_->save();
 }
 
 void CheckinCommand::undo()
@@ -63,6 +64,7 @@ void CheckinCommand::undo()
     timer_->stop();
     ui_->updateView();
     ui_->removeAlarm();
+    ui_->save();
 }
 
 // Check Out
@@ -87,6 +89,7 @@ void CheckoutCommand::redo()
     timer_->stop();
     ui_->updateView();
     ui_->removeAlarm();
+    ui_->save();
 }
 
 void CheckoutCommand::undo()
@@ -95,6 +98,7 @@ void CheckoutCommand::undo()
     timer_->start();
     ui_->updateView();
     ui_->setAlarm();
+    ui_->save();
 }
 
 // Edit Balance

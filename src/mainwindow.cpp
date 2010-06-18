@@ -282,9 +282,7 @@ void MainWindow::createUndoActions()
 
 void MainWindow::setAlarm()
 {
-    if (alarm) {
-        assert(worker.isWorking());
-
+    if (alarm && worker.isWorking()) {
         if (!worker.isOvertime()) {
             QDateTime alarmTime = worker.lastCheckin()->addSecs(worker.workdayLength() - worker.workDoneToday());
             alarm->setTime(alarmTime);
@@ -374,8 +372,6 @@ void MainWindow::updateTime()
 
     newDateTime = *target;
     newDateTime.setTime(sel->currentTime());
-
-
 
     if (newDateTime > QDateTime::currentDateTime()) {
         showWarning("New time cannot be in the future");

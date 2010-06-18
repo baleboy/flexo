@@ -39,8 +39,11 @@ void PreferencesWindow::changeExitOption()
 
 void PreferencesWindow::on_workdaySpinBox_editingFinished()
 {
-    m_worker->setWorkdayLength(int(workdaySpinBox->value() * 3600));
-    emit workdayUpdated();
+    int l = int(workdaySpinBox->value() * 3600);
+    if (l != m_worker->workdayLength()) {
+        m_worker->setWorkdayLength(l);
+        emit workdayUpdated();
+    }
 }
 
 void PreferencesWindow::on_alarmCheckBox_toggled(bool b)

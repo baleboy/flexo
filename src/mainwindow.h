@@ -43,6 +43,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
 public:
     MainWindow(QWidget *parent = 0);
+    void save();
+    void restore();
 
 public slots:
 
@@ -78,8 +80,6 @@ private:
 
     void displayTimeAtWork();
     void displayBalance();
-    void save();
-    void restore();
     void createUndoActions();
     void showWarning(const QString&);
 
