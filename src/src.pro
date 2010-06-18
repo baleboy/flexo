@@ -5,6 +5,7 @@ TEMPLATE = app
 TARGET = flexo 
 DEPENDPATH += .
 INCLUDEPATH += .
+CONFIG += qt release 
 
 # Input
 HEADERS += mainwindow.h \
@@ -48,13 +49,13 @@ maemo5 {
 }
 
 unix {
-    PREFIX = ../debian/flexo/usr
+    PREFIX = /usr
     BINDIR = $$PREFIX/bin
     DATADIR =$$PREFIX/share
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop service icon64
+    INSTALLS += target icon64 desktop service
 
     target.path =$$BINDIR
 
