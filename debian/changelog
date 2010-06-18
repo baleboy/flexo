@@ -1,3 +1,16 @@
+flexo (0.2.8) unstable; urgency=low
+
+  * Bug fixes
+  * State is saved at every check in and check out (in case battery runs out etc.) 
+
+ -- Francesco Balestrieri <bale@balenet.com>  Fri, 18 Jun 2010 19:31:00 +0300
+
+flexo (0.2-7) unstable; urgency=low
+
+  * Fixed: wrong install directory  
+
+ -- Francesco Balestrieri <bale@balenet.com>  Tue, 16 Jun 2010 19:31:00 +0300
+
 flexo (0.2-6) unstable; urgency=low
 
   * Another attempt to get the control file right

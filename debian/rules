@@ -4,7 +4,7 @@ builddir:
 	mkdir -p builddir
 
 builddir/Makefile: builddir
-	cd builddir && qmake-qt4 PREFIX=/usr ../$(APPNAME).pro
+	cd builddir && qmake-qt4 PREFIX=/usr ../src/src.pro
 
 build: build-stamp
 
@@ -31,7 +31,7 @@ install: build
 	cd builddir && $(MAKE) INSTALL_ROOT=$(CURDIR)/debian/$(APPNAME) install
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
+# We have nothing to do by default/debian/$(APPNAME).
 
 # Build architecture-dependent files here.
 binary-arch: build install
