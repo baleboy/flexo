@@ -49,9 +49,8 @@ maemo5 {
 }
 
 unix {
-    PREFIX = /usr
-    BINDIR = $$PREFIX/bin
-    DATADIR =$$PREFIX/share
+    BINDIR = /opt/flexo
+    DATADIR =/usr/share
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 

@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
+# Apparently the line below doesn't do anything since PR1.2, but it's still here
 gtk-update-icon-cache -f /usr/share/icons/hicolor
+#this is needed due to a bug in MADDE
+chmod +x /opt/flexo/flexo
 exit 0
-
-

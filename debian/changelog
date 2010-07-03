@@ -1,3 +1,9 @@
+flexo (0.2.9) unstable; urgency=low
+
+  * Optified 
+
+ -- Francesco Balestrieri <bale@balenet.com>  Fri, 02 Jul 2010 05:38:00 +0300
+
 flexo (0.2.8) unstable; urgency=low
 
   * Bug fixes
