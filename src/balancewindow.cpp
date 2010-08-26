@@ -61,7 +61,6 @@ void BalanceWindow::showBalance()
         value = double(m_worker->balance()) /
                 double(m_worker->workdayLength());
     balanceEdit->setValue(value);
-    balanceEdit->setDisabled(m_worker->isWorking());
     m_currentText = balanceEdit->text();
     if (sel->currentIndex() != m_preferences->balanceUnit())
         m_preferences->setBalanceUnit(sel->currentIndex());

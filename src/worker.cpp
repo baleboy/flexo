@@ -228,7 +228,7 @@ void Worker::copy(const Worker &w)
 void Worker::clear()
 {
     m_recordStack.clear();
-    m_workdayLength = 0;
+    m_workdayLength = DEFAULT_WORKDAY;
     m_balanceAdjustment = 0;
 }
 
