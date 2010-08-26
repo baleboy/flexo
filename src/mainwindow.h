@@ -82,6 +82,7 @@ private:
     void displayBalance();
     void createUndoActions();
     void showWarning(const QString&);
+    QString timeText(const QDateTime&);
 
     Alarm* createAlarm();
 

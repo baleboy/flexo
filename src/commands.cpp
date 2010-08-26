@@ -152,7 +152,7 @@ UpdateCheckinTimeCommand::UpdateCheckinTimeCommand(MainWindow* win, const QDateT
         m_window(win),
         m_worker(w),
         m_newDateTime(t),
-        m_oldDateTime(*w.lastCheckin())
+        m_oldDateTime(w.currentCheckin())
 {
     setText("Edit checkin time");
 }
@@ -177,7 +177,7 @@ UpdateCheckoutTimeCommand::UpdateCheckoutTimeCommand(MainWindow* win, const QDat
         m_window(win),
         m_worker(w),
         m_newDateTime(t),
-        m_oldDateTime(*w.lastCheckout())
+        m_oldDateTime(w.currentCheckout())
 {
     setText("Edit checkout time");
 }

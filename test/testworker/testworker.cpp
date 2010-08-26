@@ -21,6 +21,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtTest/QtTest>
 #include "worker.h"
+#include "constants.h"
 
 class TestWorker: public QObject
 {
@@ -52,7 +53,6 @@ void TestWorker::testConstructor()
     QVERIFY(!out.isWorking());
     QVERIFY(out.workdayLength() == 0);
 
-    out.setBalance(5);
     out.checkin();
 
     clock_ = clock_.addSecs(7245);
@@ -62,11 +62,11 @@ void TestWorker::testConstructor()
     Worker w(out);
 
     QVERIFY(w.balance() == out.balance());
-    QVERIFY(*w.lastCheckin() == *out.lastCheckin());
-    QVERIFY(*w.lastCheckout() == *out.lastCheckout());
+    QVERIFY(w.currentCheckin() == out.currentCheckin());
+    QVERIFY(w.currentCheckout() == out.currentCheckout());
     QVERIFY(w.workDoneToday() == out.workDoneToday());
-    QVERIFY(w.isWorking() == w.isWorking());
-    QVERIFY(w.workInProgress() == w.workInProgress());
+    QVERIFY(w.isWorking() == out.isWorking());
+    QVERIFY(w.workInProgress() == out.workInProgress());
 
 }
 
@@ -76,16 +76,14 @@ void TestWorker::testCopy()
 
     w1 = w2;
 
-    w1.setBalance(10000);
     w1.setWorkdayLength(27000);
-    w1.setWorkDoneToday(4000);
     w1.checkin();
 
     w2 = w1;
 
     QVERIFY(w1.balance() == w2.balance());
-    QVERIFY(*w1.lastCheckin() == *w2.lastCheckin());
-    QVERIFY((w1.lastCheckout() == w2.lastCheckout()) && !w2.lastCheckout());
+    QVERIFY(w1.currentCheckin() == w2.currentCheckin());
+    QVERIFY((w1.currentCheckout() == w2.currentCheckout()) && w2.currentCheckout().isNull());
     QVERIFY(w1.workDoneToday() == w2.workDoneToday());
     QVERIFY(w1.isWorking() == w2.isWorking());
     QVERIFY(w1.workInProgress() == w2.workInProgress());
@@ -94,8 +92,8 @@ void TestWorker::testCopy()
     w2 = w1;
 
     QVERIFY(w1.balance() == w2.balance());
-    QVERIFY(*w1.lastCheckin() == *w2.lastCheckin());
-    QVERIFY(*w1.lastCheckout() == *w2.lastCheckout());
+    QVERIFY(w1.currentCheckin() == w2.currentCheckin());
+    QVERIFY(w1.currentCheckout() == w2.currentCheckout());
     QVERIFY(w1.workDoneToday() == w2.workDoneToday());
     QVERIFY(w1.isWorking() == w2.isWorking());
     QVERIFY(w1.workInProgress() == w2.workInProgress());
@@ -107,7 +105,7 @@ void TestWorker::testWorkInProgress()
     clock_ = QDateTime::fromString("8:30", "hh:mm");
 
     QCOMPARE(out.checkin(), clock_);
-    QCOMPARE(*out.lastCheckin(), clock_);
+    QCOMPARE(out.currentCheckin(), clock_);
     QVERIFY(out.isWorking());
 
     clock_ = clock_.addSecs(7245);
@@ -150,14 +148,12 @@ void TestWorker::testBalancePositive()
     out.checkin();
     clock_=clock_.addSecs(worked);
 
-    QCOMPARE(out.balance(), -workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
+    QCOMPARE(out.balance(), 0);
 
     out.checkout();
 
+    qDebug() << out.print();
     QCOMPARE(out.balance(), worked-workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
-
 }
 
 void TestWorker::testBalanceNegative()
@@ -172,13 +168,11 @@ void TestWorker::testBalanceNegative()
     out.checkin();
     clock_=clock_.addSecs(worked);
 
-    QCOMPARE(out.balance(), -workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
+    QCOMPARE(out.balance(), 0);
 
     out.checkout();
 
     QCOMPARE(out.balance(), worked-workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
 
 }
 
@@ -197,13 +191,11 @@ void TestWorker::testShortBalance()
     clock_=clock_.addSecs(worked);
 
 
-    QCOMPARE(out.balance(), -workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
+    QCOMPARE(out.balance(), 0);
 
     out.checkout();
 
     QCOMPARE(out.balance(), worked-workday);
-    QCOMPARE(out.balanceInProgress(), worked-workday);
 
 }
 
@@ -222,14 +214,9 @@ void TestWorker::testDayChange()
     clock_ = checkoutTime;
     out.checkout();
 
-    QDateTime newStart = checkoutTime;
-    newStart.setTime(QTime::fromString("05:00:00", "hh:mm:ss"));
-
-    QCOMPARE(*out.lastCheckin(), newStart);
     QCOMPARE(out.balance(), (checkinTime.secsTo(checkoutTime) - 2*workday));
 
     out.checkin();
-    QCOMPARE(out.workDoneToday(), newStart.secsTo(checkoutTime));
 }
 
 void TestWorker::testNewDay()
@@ -256,7 +243,7 @@ void TestWorker::testWithRealClock()
     clock_ = QDateTime::currentDateTime();
     w.checkout();
 
-    if (!w.isHoliday(clock_)) {
+    if (!w.isHoliday(clock_.date())) {
         QCOMPARE(previousClock.secsTo(clock_) - w.workdayLength(), w.balance());
     }
     else {
@@ -291,10 +278,7 @@ void TestWorker::testOvertime()
 
 void TestWorker::testNeverCheckedin()
 {
-    Worker w;
-    w.setBalance(200);
-    QCOMPARE(w.balanceInProgress(), 200);
-    QCOMPARE(w.balance(), 200);
+    // TODO: add
 }
 
 void TestWorker::testSerialization()
@@ -328,9 +312,8 @@ void TestWorker::testSerialization()
 
     QCOMPARE(w1.workInProgress(), w2.workInProgress());
     QCOMPARE(w1.balance(), w2.balance());
-    QCOMPARE(w1.balanceInProgress(), w2.balanceInProgress());
     QCOMPARE(w1.workDoneToday(), w2.workDoneToday());
-    QCOMPARE(*w1.lastCheckin(), *w2.lastCheckin());
+    QCOMPARE(w1.currentCheckin(), w2.currentCheckin());
 
     w1.checkout();
     b.open(QIODevice::WriteOnly);
@@ -342,10 +325,9 @@ void TestWorker::testSerialization()
 
     QCOMPARE(w1.workInProgress(), w2.workInProgress());
     QCOMPARE(w1.balance(), w2.balance());
-    QCOMPARE(w1.balanceInProgress(), w2.balanceInProgress());
     QCOMPARE(w1.workDoneToday(), w2.workDoneToday());
-    QCOMPARE(*w1.lastCheckin(), *w2.lastCheckin());
-    QCOMPARE(*w1.lastCheckout(), *w2.lastCheckout());
+    QCOMPARE(w1.currentCheckin(), w2.currentCheckin());
+    QCOMPARE(w1.currentCheckout(), w2.currentCheckout());
 
 }
 
@@ -379,21 +361,20 @@ void TestWorker::testUpdateCheckin()
     checkinTime = checkinTime.addSecs(-300);
 
     QVERIFY(w.updateCheckinTime(checkinTime) == 0);
-    QCOMPARE(double(w.balance()), -(3600*7.5));
-    QCOMPARE(double(w.balanceInProgress()), -(3600*7.5) + 300);
-    QCOMPARE(*w.lastCheckin(), checkinTime);
+    QCOMPARE(w.balance(), 0);
+
+    QCOMPARE(w.currentCheckin(), checkinTime);
 
     checkinTime = checkinTime.addSecs(600);
 
     QVERIFY(w.updateCheckinTime(checkinTime) == 0);
-    QCOMPARE(double(w.balance()), -(3600*7.5));
-    QCOMPARE(double(w.balanceInProgress()), -(3600*7.5) - 300);
-    QCOMPARE(*w.lastCheckin(), checkinTime);
+    QCOMPARE(w.balance(), 0);
+
+    QCOMPARE(w.currentCheckin(), checkinTime);
 
     clock_ = clock_.addSecs(1000);
     w.checkout();
 
-    QCOMPARE(w.balance(), w.balanceInProgress());
     QCOMPARE(double(w.balance()), -(3600*7.5) + 700);
 
     QVERIFY(w.updateCheckoutTime(checkinTime.addSecs(-300)) == -1);

@@ -56,9 +56,9 @@ void BalanceWindow::showBalance()
             qobject_cast<QMaemo5ListPickSelector *>(balanceUnitButton->pickSelector());
     double value;
     if (sel->currentIndex() == 0)
-        value = double(m_worker->balanceInProgress()) / 3600.0;
+        value = double(m_worker->balance()) / 3600.0;
     else
-        value = double(m_worker->balanceInProgress()) /
+        value = double(m_worker->balance()) /
                 double(m_worker->workdayLength());
     balanceEdit->setValue(value);
     balanceEdit->setDisabled(m_worker->isWorking());

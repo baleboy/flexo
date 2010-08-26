@@ -24,10 +24,10 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtGui>
 #include <QSettings>
 #include <QtDebug>
-#include <assert.h>
 #include <QMaemo5InformationBox>
 #include <QDBusInterface>
-#include <QMaemo5TimePickSelector>
+#include <QDialog>
+#include <assert.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -39,6 +39,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "preferenceswindow.h"
 #include "constants.h"
 #include "preferences.h"
+#include "timechangedialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
         : QMainWindow(parent), alarm(0), m_balanceWindow(0)
@@ -46,10 +47,7 @@ MainWindow::MainWindow(QWidget* parent)
     setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     setAttribute(Qt::WA_Maemo5StackedWindow);
-    QMaemo5TimePickSelector *sel = new QMaemo5TimePickSelector;
-    checkInText->setPickSelector(sel);
-    checkInText->setValueLayout(QMaemo5ValueButton::ValueBesideText);
-    // connect(sel, SIGNAL(selected(QString)), this, SLOT(updateTime()));
+
     connect(checkInText, SIGNAL(clicked()), this, SLOT(updateTime()));
 
     QAction *actionReset = new QAction(tr("Clear All"), this);
@@ -71,9 +69,7 @@ MainWindow::MainWindow(QWidget* parent)
         alarm = createAlarm();
     }
 
-    qDebug() << "about to update view";
     updateView();
-    qDebug() << "view updated";
 
     if (worker.isWorking())
         timer->start();
@@ -85,24 +81,19 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::updateView()
 {
-    QMaemo5TimePickSelector *sel =
-            qobject_cast<QMaemo5TimePickSelector *>(checkInText->pickSelector());
-
     bool showText = false;
 
     if (worker.isWorking()) {
         checkInToggle->setChecked(true);
-        if (worker.lastCheckin()) {
-            checkInText->setText("Checked in at");
-            sel->setCurrentTime(worker.lastCheckin()->time());
+        if (worker.currentCheckin().isValid()) {
+            checkInText->setText("Checked in at " + timeText(worker.currentCheckin()));
             showText = true;
         }
     }
     else {
         checkInToggle->setChecked(false);
-        if (worker.lastCheckout()){
-            checkInText->setText("Checked out at");
-            sel->setCurrentTime(worker.lastCheckout()->time());
+        if (worker.currentCheckout().isValid()){
+            checkInText->setText("Checked out at " + timeText(worker.currentCheckout()));
             showText = true;
         }
     }
@@ -284,7 +275,7 @@ void MainWindow::setAlarm()
 {
     if (alarm && worker.isWorking()) {
         if (!worker.isOvertime()) {
-            QDateTime alarmTime = worker.lastCheckin()->addSecs(worker.workdayLength() - worker.workDoneToday());
+            QDateTime alarmTime = worker.currentCheckin().addSecs(worker.workdayLength() - worker.workDoneToday());
             alarm->setTime(alarmTime);
             alarm->set();
         }
@@ -354,49 +345,57 @@ Alarm* MainWindow::createAlarm()
 
 void MainWindow::updateTime()
 {
-    QMaemo5TimePickSelector *sel =
-            qobject_cast<QMaemo5TimePickSelector *>(checkInText->pickSelector());
-    QTime storedTime;
-    QDateTime newDateTime;
-    const QDateTime* target;
+    TimeChangeDialog dialog(this);
+    QDateTime target;
 
-    if(worker.isWorking())
-        target = worker.lastCheckin();
-    else
-        target = worker.lastCheckout();
+    if(worker.isWorking()) {
+        target = worker.currentCheckin();
+        dialog.setWindowTitle("Update your check-in time");
+    }
+    else {
+        target = worker.currentCheckout();
+        dialog.setWindowTitle("Update your check-out time");
+    }
+    dialog.timeEdit->setTime(target.time());
+    dialog.dateEdit->setDate(target.date());
 
-    storedTime = target->time();
-
-    if (sel->currentTime() == storedTime)
+    if (dialog.exec() == QDialog::Rejected)
         return;
 
-    newDateTime = *target;
-    newDateTime.setTime(sel->currentTime());
+    QDateTime newDateTime;
+    newDateTime.setDate(dialog.dateEdit->date());
+    newDateTime.setTime(dialog.timeEdit->time());
+
+    if (newDateTime == target)
+        return;
 
     if (newDateTime > QDateTime::currentDateTime()) {
         showWarning("New time cannot be in the future");
-        sel->setCurrentTime(storedTime);
         return;
     }
 
     if (worker.isWorking()) {
-        if (worker.lastCheckout()) {
-            if (newDateTime < *worker.lastCheckout()) {
+        if (worker.currentCheckout().isValid()) {
+            if (newDateTime < worker.currentCheckout()) {
                 showWarning("Checkin time cannot be earlier than last checkout");
-                sel->setCurrentTime(storedTime);
                 return;
             }
         }
         undoStack->push(new UpdateCheckinTimeCommand(this, newDateTime, worker));
     }
     else {
-        if (newDateTime < *worker.lastCheckin()) {
+        if (newDateTime < worker.currentCheckin()) {
             showWarning("Checkout time cannot be earlier than last checkin");
-            sel->setCurrentTime(storedTime);
             return;
         }
         undoStack->push(new UpdateCheckoutTimeCommand(this, newDateTime, worker));
     }
+    updateView();
+}
+
+QString MainWindow::timeText(const QDateTime &t)
+{
+    return t.time().toString("hh:mm");
 }
 
 void MainWindow::showWarning(const QString &msg)

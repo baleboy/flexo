@@ -24,9 +24,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QTime>
 
-#ifdef WORKER_TEST
-extern QDateTime clock_;
-#endif
+#include "recordstack.h"
 
 class QDateTime;
 
@@ -36,18 +34,13 @@ class QDateTime;
  * As the worker keeps working, it accrues a balance of hours which can be positive or negative based
  * on how much work was done compared to what was expected.
  *
- * A working day doesn't have a pre-defined start or end time, but any work done before 5am is considered
- * to belong to the previous day.
- *
  * If a worker doesn't check in at all during a day, that day is not considered in the balance calculation.
  *
  * If a worker checks in during the weekend, any work done is considered as overtime (i.e. increases the balance)
  *
- * The expected amount of work during a day can be changed.
- * The new value doesn't affect balance calculation for past workdays.
+ * The expected amount of work during a day can be changed, in which case the balance is
+ * calculated according to the new value
  *
- * For simplicity, if the worker checks out after more than 24 hours since the last checkin,
- * this is considered an error
  */
 class Worker {
 
@@ -65,9 +58,6 @@ public:
     /*
      * start working. If already working, do nothing.
      *
-     * If this is the first checkin of the day, the amount of work expected for the day
-     * is subtracted from the current balance.
-     *
      * Returns the checkin time
      */
     QDateTime checkin();
@@ -75,18 +65,16 @@ public:
     /*
      * Stop working. If not working at the moment, do nothing.
      *
-     * The balance is updated when the user checks out. If the last
-     * checkin was in the previous day, the last checkin time is udpated to 5 am
-     * of the current day and a new day starts.
+     * Returns the amount of work done since the last checkin, in seconds. Returns
+     * -1 if there has been no check in at all.
      *
-     * Returns the amount of work done since the last checkin, in seconds. If the time since the
-     * last checkin is greater than 24 hours, returns -1
      */
     int checkout();
 
     /*
      * Returns the total amount of work done in the current workday, in seconds,
-     * until the last checkout. If the last checkin was in the previous day, returns 0
+     * until the last checkout. If the current checkin was in the previous day,
+     * returns 0.
      */
     int workDoneToday() const;
 
@@ -104,13 +92,10 @@ public:
      */
     int balance() const;
 
-    /*
-     * Returns the balance in progress (in seconds), i.e. what the balance would be if the worker
-     * checked out now.
-     *
-     * Returns a negative value if the worker is slacking
+    /**
+     * Set the current balance
      */
-    int balanceInProgress() const;
+    void setBalance(int);
 
     /*
      * Returns true if the worker is currently doing overtime work
@@ -118,16 +103,16 @@ public:
     bool isOvertime() const;
 
     /*
-     * Returns a pointer to the last checkin time, or null if the worker
-     * never checked in
+     * Returns the current checkin time. The returned datetime object is not valid if the worker
+     * never checked in, or if the worker is currently checked out.
      */
-    const QDateTime* lastCheckin() const;
+    QDateTime currentCheckin() const;
 
     /*
-     * Returns a pointer to the last checkout time, or null if the worker
-     * never checked out
+     * Returns the current checkout time. The returned datetime object is not valid if the worker
+     * never checked out, or if the worker is currently checked in.
      */
-    const QDateTime* lastCheckout() const;
+    QDateTime currentCheckout() const;
 
     /*
      * Returns true if the current time is a holiday
@@ -137,54 +122,43 @@ public:
     /*
      * Returns true if the date given as parameter is a holiday
      */
-    bool isHoliday(const QDateTime&) const;
+    bool isHoliday(const QDate&) const;
 
     QString print() const;
 
     /*!
-     * Update time of last checkin. If the worker is not working,
-     * this modified the current balance.
+     * Update time of the current checkin.
      *
-     * Returns -1 if the worker is not working and the checkin time
-     * is greater than the checkout time, 0 otherwise.
+     * Returns -1 if the worker is not working, or if the new checkin time
+     * is earlier than the last checkout, 0 otherwise.
      */
     int updateCheckinTime(const QDateTime&);
 
     /*!
-     * Update time of last checkout, and update the current balance
-     * accordingly.
+     * Update time of the current checkout.
      *
      * Returns -1 if the checkout time is less than the checkin time,
-     * 0 otherwise.
+     * or if the worker is still working, 0 otherwise.
      */
     int updateCheckoutTime(const QDateTime&);
 
-    // assorted accessor methods generally used at initialization and when storing state
-    void setLastCheckin(const QDateTime&);
-    void setLastCheckout(const QDateTime&);
     int workdayLength() const;
     void setWorkdayLength(int);
-    void setBalance(int);
-    void setWorkDoneToday(int);
     bool isWorking() const;
-    void setWorking(bool b) { working_ = b; };
+
+    friend QDataStream& operator<< (QDataStream&, const Worker&);
+    friend QDataStream& operator>> (QDataStream&, Worker&);
 
 private:
 
-    bool working_;
-    QDateTime *lastCheckin_;
-    QDateTime *lastCheckout_;
+    RecordStack m_recordStack;
 
-    int workDoneToday_;
-
-    int workdayLength_;
-    int balance_;
-    bool isHoliday_;
-
-    static const QTime startTime_;
+    quint32 m_workdayLength;
+    quint32 m_balanceAdjustment;
 
     void copy(const Worker&);
 
+    int balanceFromHistory() const;
 };
 
 QDataStream& operator<< (QDataStream&, const Worker&);

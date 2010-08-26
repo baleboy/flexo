@@ -21,26 +21,17 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDateTime>
 #include <QtDebug>
+#include <assert.h>
 
 #include "worker.h"
-
-// if compiled for test, replace the actual clock with a global variable
-// that can be manipulated by the test program
-#ifdef WORKER_TEST
-QDateTime clock_;
-#define CURRENT_TIME clock_
-#else
-#define CURRENT_TIME QDateTime::currentDateTime()
-#endif
+#include "record.h"
+#include "constants.h"
 
 #define DAY_IN_SECS (24*3600)
 
-const QTime Worker::startTime_(QTime::fromString("05:00:00", "hh:mm:ss"));
-
 Worker::Worker()
-    : working_(0), lastCheckin_(0), lastCheckout_(0), workDoneToday_(0),
-      workdayLength_(0), balance_(0), isHoliday_(false)
 {
+    clear();
 }
 
 Worker::Worker(const Worker &w)
@@ -51,373 +42,221 @@ Worker::Worker(const Worker &w)
 
 Worker::~ Worker()
 {
-    if (lastCheckin_) delete lastCheckin_;
-    if (lastCheckout_) delete lastCheckout_;
+
 }
 
 Worker& Worker::operator=(const Worker& w)
 {
     if (this != &w) {
-        if (lastCheckin_) delete lastCheckin_;
-        if (lastCheckout_) delete lastCheckout_;
         copy(w);
     }
     return *this;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 QDateTime Worker::checkin()
 {
-    bool firstCheckin = false;
-    if (working_) {
-        qDebug("Warning: checked in while already working");
+    if (!m_recordStack.isEmpty()) {
+        if (m_recordStack.top().inProgress())
+            return m_recordStack.top().checkinTime();
     }
-    else {
-        if (!lastCheckin_) {
-            lastCheckin_ = new QDateTime();
-            firstCheckin = true;
-        }
-        QDateTime now = CURRENT_TIME;
-        QDateTime dayStart = now;
-        dayStart.setTime(startTime_);
-
-        if (*lastCheckin_ < dayStart || firstCheckin ) {
-            // first checkin of the day
-            workDoneToday_ = 0;
-            if (!isHoliday(now)) {
-                balance_ -= workdayLength_;
-            }
-        }
-
-        *lastCheckin_ = now;
-        working_ = true;
-    }
-    return *lastCheckin_;
+    Record r(CURRENT_TIME);
+    int res = m_recordStack.push(r);
+    assert(res == 0);
+    return r.checkinTime();
 }
 
-///////////////////////////////////////////////////////////////////////////////
 int Worker::checkout()
 {
-    if (!working_) {
-        qDebug("Warning: checked out while not working");
-        return 0;
-    }
-
-    QDateTime t = CURRENT_TIME;
-    int workSinceLastCheckin = lastCheckin_->secsTo(t);
-
-    if ( workSinceLastCheckin > DAY_IN_SECS) {
-        qDebug("Warning: checked out after more than 24 hrs");
+    if (m_recordStack.isEmpty())
         return -1;
+
+    if (m_recordStack.top().inProgress()) {
+        Record r = m_recordStack.top();
+        int res = r.setCheckoutTime(CURRENT_TIME);
+        assert(res == 0);
+        res = m_recordStack.replace(m_recordStack.size() - 1, r);
+        assert(res == 0);
     }
-
-    QDateTime dayStart = t;
-    dayStart.setTime(startTime_);
-
-    if ((*lastCheckin_ < dayStart) && (t >= dayStart)) {
-        if (!isHoliday(*lastCheckin_)) {
-            balance_ -= workdayLength_;
-        }
-        workDoneToday_ = dayStart.secsTo(CURRENT_TIME);
-        *lastCheckin_ = dayStart;
-    }
-    else {
-        workDoneToday_ += workSinceLastCheckin;
-    }
-    balance_ += workSinceLastCheckin;
-    working_ = false;
-
-    if (!lastCheckout_) {
-        lastCheckout_ = new QDateTime();
-    }
-    *lastCheckout_ = t;
-
-    return workSinceLastCheckin;
-
+    return m_recordStack.top().elapsed();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+int Worker::balanceFromHistory() const
+{
+    if (m_recordStack.isEmpty() ||
+        (m_recordStack.size() == 1 && m_recordStack.top().inProgress()))
+        return 0;
+
+    QDate lastDay;
+    int lastRecord;
+    if (m_recordStack.top().inProgress()) {
+        lastDay = m_recordStack.at(m_recordStack.size() - 2).checkoutTime().date();
+        lastRecord = m_recordStack.size() - 2;
+    }
+    else {
+        lastDay = m_recordStack.top().checkoutTime().date();
+        lastRecord = m_recordStack.size() - 1;
+    }
+
+    // first calculate the amount of work that should have been done
+    // based on the number of days, then the amount of work done based
+    // on the records. Won't get me a job at Google but it works.
+    int balance = 0;
+    for (QDate day = m_recordStack.at(0).checkinTime().date() ; day <= lastDay ; day = day.addDays(1)) {
+        if (!isHoliday(day))
+            balance -= m_workdayLength;
+    }
+    qDebug() << "balance expected: " << balance;
+
+    for (int i = 0; i <= lastRecord; ++i) {
+        balance += m_recordStack.at(i).elapsed();
+        qDebug() << "elapsed: " << m_recordStack.at(i).elapsed();
+    }
+
+    return balance;
+}
+
 int Worker::balance() const
 {
-    return balance_;
+    return m_balanceAdjustment + balanceFromHistory();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-int Worker::workDoneToday() const
+void Worker::setBalance(int b)
 {
-    if (lastCheckin_) {
-        QDateTime t = CURRENT_TIME;
-        QDateTime dayStart = t;
-        dayStart.setTime(startTime_);
-        if ((*lastCheckin_ < dayStart) && (t >= dayStart) && !working_) {
-            return 0;
-        }
-    }
-    return workDoneToday_;
+    m_balanceAdjustment = b - balanceFromHistory();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+int Worker::workDoneToday() const
+{   
+    int done = 0;
+    int i = m_recordStack.size() - 1;
+    while (i >= 0) {
+        if (m_recordStack.at(i).checkinTime().date() != CURRENT_TIME.date())
+            break;
+        if (!m_recordStack.at(i).inProgress())
+            done += m_recordStack.at(i).elapsed();
+        --i;
+    }
+    return done;
+}
+
 bool Worker::isWorking() const
 {
-    return working_;
+    if (m_recordStack.isEmpty()) return false;
+
+    return (m_recordStack.top().inProgress());
 }
 
-///////////////////////////////////////////////////////////////////////////////
-const QDateTime* Worker::lastCheckin() const
+QDateTime Worker::currentCheckin() const
 {
-    return lastCheckin_;
+    QDateTime res;
+
+    if (!m_recordStack.isEmpty())
+        res = m_recordStack.top().checkinTime();
+
+    return res;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-const QDateTime* Worker::lastCheckout() const
+QDateTime Worker::currentCheckout() const
 {
-    return lastCheckout_;
+    QDateTime res;
+
+    if (!m_recordStack.isEmpty())
+        res = m_recordStack.top().checkoutTime();
+
+    return res;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void Worker::setLastCheckin(const QDateTime& d)
+int Worker::updateCheckinTime(const QDateTime& t)
 {
-    if (!lastCheckin_)
-        lastCheckin_ = new QDateTime(d);
-    else
-        *lastCheckin_ = d;
+    Record r = m_recordStack.top();
+    int res = r.setCheckinTime(t);
+    if (res != -1)
+        res = m_recordStack.replace(m_recordStack.size() - 1, r);
+    return res;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void Worker::setLastCheckout(const QDateTime& d)
+int Worker::updateCheckoutTime(const QDateTime& t)
 {
-    if (!lastCheckout_)
-        lastCheckout_ = new QDateTime(d);
-    else
-        *lastCheckout_ = d;
+    Record r = m_recordStack.top();
+    int res = r.setCheckoutTime(t);
+    if (res != -1)
+        res = m_recordStack.replace(m_recordStack.size() - 1, r);
+    return res;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-int Worker::updateCheckinTime(const QDateTime& d)
-{
-    if (lastCheckout_) {
-        if (((d > *lastCheckout_) && !working_) ||
-            ((d < *lastCheckout_) && working_)) {
-            return -1;
-        }
-    }
-
-    if (!lastCheckin_) {
-        lastCheckin_ = new QDateTime(d);
-    }
-    else {
-        if (!working_) {
-            balance_ += d.secsTo(*lastCheckin_);
-        }
-        *lastCheckin_ = d;
-    }
-    return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int Worker::updateCheckoutTime(const QDateTime& d)
-{
-    if (lastCheckin_) {
-        if (((d < *lastCheckin_) && !working_) ||
-            ((d > *lastCheckin_) && working_)) {
-            return -1;
-        }
-    }
-    if (!lastCheckout_) {
-        lastCheckout_ = new QDateTime(d);
-    }
-    else {
-        int delta = d.secsTo(*lastCheckout_);
-        balance_ -= delta;
-        workDoneToday_ -= delta;
-        *lastCheckout_ = d;
-    }
-    return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int Worker::workdayLength() const
 {
-    return workdayLength_;
+    return m_workdayLength;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 void Worker::setWorkdayLength(int s)
 {
-    workdayLength_ = s;
+    m_workdayLength = s;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void Worker::setWorkDoneToday(int s)
-{
-    workDoneToday_ = s;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int Worker::workInProgress() const
 {
-    return (working_ ? lastCheckin_->secsTo(CURRENT_TIME) : 0);
+    return (isWorking() ? m_recordStack.top().elapsed() : 0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 bool Worker::isOvertime() const
 {
-    int legalWork = isHoliday(CURRENT_TIME)? 0 : workdayLength_;
-    return ((workDoneToday() + workInProgress() > legalWork) ||
-            ((workDoneToday() + workInProgress() == legalWork) && isWorking()));
+    int legalWork = isHoliday() ? 0 : m_workdayLength;
+
+    int total = workDoneToday() + workInProgress();
+    return ((total > legalWork) ||
+            ((total == legalWork) && isWorking()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-bool Worker::isHoliday(const QDateTime& t) const
+bool Worker::isHoliday(const QDate& d) const
 {
-    return (t.date().dayOfWeek() == 6) || (t.date().dayOfWeek() == 7) || isHoliday_;
+    return (d.dayOfWeek() == 6) || (d.dayOfWeek() == 7);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 bool Worker::isHoliday() const
 {
-    return (isHoliday(CURRENT_TIME));
+    return (isHoliday(CURRENT_TIME.date()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-void Worker::setBalance(int s)
-{
-    balance_ = s;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int Worker::balanceInProgress() const
-{
-    if (!lastCheckin_ || !working_) {
-       return balance_;
-    }
-
-    int currentBalance = balance_;
-    QDateTime t = CURRENT_TIME;
-    int workSinceLastCheckin = lastCheckin_->secsTo(t);
-
-    if ( workSinceLastCheckin > DAY_IN_SECS) {
-        return -1;
-    }
-
-    QDateTime dayStart = t;
-    dayStart.setTime(startTime_);
-
-    if ((*lastCheckin_ < dayStart) && (t >= dayStart) && !isHoliday(*lastCheckin_)) {
-        currentBalance -= workdayLength_;
-    }
-
-    currentBalance += workSinceLastCheckin;
-
-    return currentBalance;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 void Worker::copy(const Worker &w)
 {
-    working_ = w.working_;
-    workDoneToday_ = w.workDoneToday_;
-    workdayLength_ = w.workdayLength_;
-    balance_ = w.balance_;
-    isHoliday_ = w.isHoliday_;
-
-    if (w.lastCheckin_) {
-        lastCheckin_ = new QDateTime(*w.lastCheckin_);
-    }
-    else {
-        lastCheckin_ = 0;
-    }
-
-    if (w.lastCheckout_) {
-        lastCheckout_ = new QDateTime(*w.lastCheckout_);
-    }
-    else {
-        lastCheckout_ = 0;
-    }
+    m_recordStack = w.m_recordStack;
+    m_workdayLength = w.m_workdayLength;
+    m_balanceAdjustment = w.m_balanceAdjustment;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 void Worker::clear()
 {
-    working_ = 0;
-    if (lastCheckin_) {
-        delete lastCheckin_;
-        lastCheckin_ = 0;
-    }
-    if (lastCheckout_) {
-        delete lastCheckout_;
-        lastCheckout_ = 0;
-    }
-
-    workDoneToday_ = 0;
-    balance_ = 0;
-    isHoliday_ = false;
+    m_recordStack.clear();
+    m_workdayLength = 0;
+    m_balanceAdjustment = 0;
 }
 
 QString Worker::print() const
 {
     QString s;
-    QTextStream out(&s)
-            ;
-    out << "balance: " << balance() << endl;
-    out << "balanceInProgress: " << balanceInProgress() << endl;
-    out << "workDoneToday: " << workDoneToday() << endl;
-    out << "working: " << isWorking() << endl;
-    out << "work in progress: " << workInProgress() << endl;
-    out << "workday length: " << endl;
+    QTextStream out(&s);
+    out << "workday length: " << m_workdayLength << endl;
+    for (int i = 0 ; i < m_recordStack.size() ; ++i) {
+        out << "Record [" << i << "]: in "
+            << m_recordStack.at(i).checkinTime().toString()
+            << ", out " << m_recordStack.at(i).checkoutTime().toString()
+            << endl;
 
-    if (lastCheckin())
-        out << "lastCheckin: " << lastCheckin()->toString();
-    else
-        out << "not checked in yet";
-    out << endl;
-
-    if (lastCheckout())
-        out << "lastCheckout: " << lastCheckin()->toString();
-    else
-        out << "not checked out yet";
-    out << endl;
-
+    }
     return s;
-
 }
 
 QDataStream& operator>> (QDataStream& in, Worker& w)
 {
-    quint32 balance;
-    quint8 working;
-    quint32 doneToday;
-    quint32 wdayLength;
-    quint8 hasTime;
-    QDateTime time;
-
-    in >> balance >> working >> doneToday >> wdayLength >> hasTime;
-    if (hasTime) {
-        in >> time;
-        w.setLastCheckin(time);
-    }
-    in >> hasTime;
-    if (hasTime) {
-        in >> time;
-        w.setLastCheckout(time);
-    }
-
-    w.setBalance(balance);
-    w.setWorking(working);
-    w.setWorkDoneToday(doneToday);
-    w.setWorkdayLength(wdayLength);
-
+    in >> w.m_recordStack >> w.m_workdayLength >> w.m_balanceAdjustment;
     return in;
 }
 
 QDataStream& operator<< (QDataStream& out, const Worker& w)
 {
-    out << quint32(w.balance()) << quint8(w.isWorking()) << quint32(w.workDoneToday())
-            << quint32(w.workdayLength()) << quint8(w.lastCheckin() != NULL);
-    if (w.lastCheckin())
-        out << *w.lastCheckin();
-    out << quint8(w.lastCheckout() != NULL);
-    if (w.lastCheckout())
-        out << *w.lastCheckout();
+    out << w.m_recordStack
+        << quint32(w.m_workdayLength)
+        << quint32(w.m_balanceAdjustment);
     return out;
 }
