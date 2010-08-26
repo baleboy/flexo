@@ -11,6 +11,7 @@ const QString APP_NAME = "flexo";
 const QString APP_ID = ORG_ID + "." + APP_NAME;
 const QString DBUS_PATH = "/com/balenet/flexo";
 const QString SAVEFILE = QDir::home().filePath(".flexo.data");
+const QString LEGACY_SAVEFILE = QDir::home().filePath(".flexo");
 
 // if compiled for test, replace the actual clock with a global variable
 // that can be manipulated by the test program

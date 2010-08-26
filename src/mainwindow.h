@@ -28,6 +28,7 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 class QTimer;
 class QUndoStack;
 class QActionGroup;
+class QFile;
 class Alarm;
 class BalanceWindow;
 class ExitDialog;
@@ -83,6 +84,7 @@ private:
     void createUndoActions();
     void showWarning(const QString&);
     QString timeText(const QDateTime&);
+    void restoreLegacyData(QFile&);
 
     Alarm* createAlarm();
 

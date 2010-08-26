@@ -191,7 +191,7 @@ void MainWindow::save()
     m_preferences->save();
     QFile file(SAVEFILE);
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "Couldn't open savefile";
+        qWarning() << "Couldn't open savefile";
         return;
     }
     QDataStream out(&file);
@@ -203,6 +203,14 @@ void MainWindow::save()
 void MainWindow::restore()
 {
     m_preferences->load();
+
+    // if there is data from Flexo pre-0.2.10, import it
+    // and erase the file
+    QFile oldfile(LEGACY_SAVEFILE);
+    if (oldfile.open(QIODevice::ReadOnly)) {
+        restoreLegacyData(oldfile);
+        oldfile.remove();
+    }
 
     QFile file(SAVEFILE);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -401,4 +409,34 @@ QString MainWindow::timeText(const QDateTime &t)
 void MainWindow::showWarning(const QString &msg)
 {
     QMaemo5InformationBox::information(this, msg);
+}
+
+void MainWindow::restoreLegacyData(QFile& file)
+{
+    quint32 balance;
+    quint8 working;
+    quint32 doneToday;
+    quint32 wdayLength;
+    quint8 hasTime;
+    QDateTime time;
+
+    QDataStream in(&file);
+
+    in >> balance >> working >> doneToday >> wdayLength >> hasTime;
+
+    if (hasTime) {
+        in >> time;
+        worker.checkin();
+        worker.updateCheckinTime(time);
+    }
+    in >> hasTime;
+    if (hasTime && !working) {
+        in >> time;
+        worker.checkout();
+        worker.updateCheckoutTime(time);
+    }
+
+    worker.setBalance(balance + wdayLength);
+
+    worker.setWorkdayLength(wdayLength);
 }
