@@ -2,7 +2,7 @@ Source: flexo
 Maintainer: Francesco Balestrieri <bale@balenet.com>
 Section: user/utilities
 Priority: optional
-Build-Depends: debhelper (>= 5), libqt4-dev, libalarm-dev
+Build-Depends: debhelper (>= 5), libqt4-dev, libalarm-dev, mce-dev
 Standards-Version: 3.7.2
 XSBC-Bugtracker: mailto:bale@balenet.com
 
@@ -14,7 +14,7 @@ Description: Simple flexi-time tracker
  With Flexo, sticking it to the man has never been easier!
  For more information: http://www.balenet.com/flexo
 XB-Maemo-Display-Name: Flexo
-XB-Maemo-Upgrade-Description: Executable moved to /opt 
+XB-Maemo-Upgrade-Description: Checkout time can be updated the next day in case you forgot to checkout. Some power management optimizations. 
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAK
  T2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AU

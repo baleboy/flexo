@@ -1,3 +1,12 @@
+flexo (0.2.10) unstable; urgency=low
+
+  * Dialog to update checkin and checkout times includes date
+  * If the user forgot to checkout in a day, checkout time can be updated the next day 
+  * Balance can be edited also while checked in
+  * Battery life is saved by suspending the timer when the application is inactive
+
+ -- Francesco Balestrieri <bale@balenet.com>  Fri, 27 Aug 2010 07:00:00 +0300
+
 flexo (0.2.9) unstable; urgency=low
 
   * Optified 
