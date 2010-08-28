@@ -53,6 +53,7 @@ public slots:
     void Activate();
     void setAlarm();
     void removeAlarm();
+    void setInactive(bool);
 
 private slots:
 
@@ -61,15 +62,14 @@ private slots:
     void on_settingsButton_clicked();
 
     void updateTime();
-
     void toggleAlarm(bool);
-
     void reset();
-
     void onTimer();
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent*);
+
+    bool event (QEvent*);
 
 private:
 

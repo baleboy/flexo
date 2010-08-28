@@ -440,3 +440,31 @@ void MainWindow::restoreLegacyData(QFile& file)
 
     worker.setWorkdayLength(wdayLength);
 }
+
+void MainWindow::setInactive(bool inactive)
+{
+    if (isActiveWindow()) {
+        if (inactive)
+            QCoreApplication::postEvent(this, new QEvent(QEvent::WindowDeactivate));
+        else
+            QCoreApplication::postEvent(this, new QEvent(QEvent::WindowActivate));
+    }
+}
+
+bool MainWindow::event (QEvent* e)
+{
+    switch (e->type()) {
+    case QEvent::WindowActivate:
+        qDebug() << "*** Window activate";
+        timer->start();
+        displayTimeAtWork();
+        break;
+    case QEvent::WindowDeactivate:
+        qDebug() << "*** Window deactivate";
+        timer->stop();
+        break;
+    default:
+        break;
+    }
+    return QMainWindow::event(e);
+}

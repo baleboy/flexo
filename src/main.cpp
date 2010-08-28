@@ -21,6 +21,10 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtGui>
 #include <QtDBus/QDBusConnection>
+
+#include <mce/dbus-names.h>
+#include <mce/mode-names.h>
+
 #include "mainwindow.h"
 #include "dbusifadaptor.h"
 #include "constants.h"
@@ -33,9 +37,13 @@ int main(int argc, char **argv)
 
     new DBusIfAdaptor(&MainWindow);
 
-    QDBusConnection connection = QDBusConnection::sessionBus();
-    bool ret = connection.registerService(APP_ID);
-    ret = connection.registerObject(DBUS_PATH, &MainWindow);
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    bool ret = bus.registerService(APP_ID);
+    ret = bus.registerObject(DBUS_PATH, &MainWindow);
 
+    // connect main window to MCE inactivity signals
+    bus = QDBusConnection::systemBus();
+    bus.connect(MCE_SERVICE, MCE_SIGNAL_PATH, MCE_SIGNAL_IF,
+                MCE_INACTIVITY_SIG , &MainWindow, SLOT(setInactive(bool)));
     return app.exec();
 }
