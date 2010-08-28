@@ -418,27 +418,27 @@ void MainWindow::restoreLegacyData(QFile& file)
     quint32 doneToday;
     quint32 wdayLength;
     quint8 hasTime;
-    QDateTime time;
+    QDateTime checkinTime;
+    QDateTime checkoutTime;
 
     QDataStream in(&file);
 
     in >> balance >> working >> doneToday >> wdayLength >> hasTime;
 
     if (hasTime) {
-        in >> time;
+        in >> checkinTime;
         worker.checkin();
-        worker.updateCheckinTime(time);
+        worker.updateCheckinTime(checkinTime);
     }
     in >> hasTime;
     if (hasTime && !working) {
-        in >> time;
+        in >> checkoutTime;
         worker.checkout();
-        worker.updateCheckoutTime(time);
+        worker.updateCheckoutTime(checkoutTime);
     }
-
-    worker.setBalance(balance + wdayLength);
-
+    qDebug() << "Old balance: " << balance;
     worker.setWorkdayLength(wdayLength);
+    worker.setBalance(balance);
 }
 
 void MainWindow::setInactive(bool inactive)

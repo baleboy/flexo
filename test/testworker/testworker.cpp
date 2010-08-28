@@ -42,6 +42,7 @@ private slots:
     void testSerialization();
     void testPrint();
     void testUpdateCheckin();
+    void testSetBalance();
 };
 
 void TestWorker::testConstructor()
@@ -51,7 +52,7 @@ void TestWorker::testConstructor()
 
     QVERIFY(out.workDoneToday() == 0);
     QVERIFY(!out.isWorking());
-    QVERIFY(out.workdayLength() == 0);
+    QVERIFY(out.workdayLength() == DEFAULT_WORKDAY);
 
     out.checkin();
 
@@ -384,6 +385,25 @@ void TestWorker::testUpdateCheckin()
     QVERIFY(w.updateCheckoutTime(checkoutTime) == 0);
     QCOMPARE(double(w.balance()), -(3600*7.5) + 400);
 
+}
+
+void TestWorker::testSetBalance()
+{
+    Worker w;
+    int workday = 3600*7.5;
+    w.setWorkdayLength(workday);
+    clock_ = QDateTime::fromString("M1d1y201011:01:02",
+                                                  "'M'M'd'd'y'yyyyhh:mm:ss");
+
+    w.checkin();
+    clock_ = clock_.addSecs(3600*8);
+
+    w.setBalance(500);
+    QCOMPARE(w.balance(), 500);
+
+    w.checkout();
+    w.setBalance(500);
+    QCOMPARE(w.balance(), 500);
 }
 
 QTEST_MAIN(TestWorker)
