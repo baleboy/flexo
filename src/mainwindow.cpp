@@ -41,8 +41,18 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "preferences.h"
 #include "timechangedialog.h"
 
-MainWindow::MainWindow(QWidget* parent)
-        : QMainWindow(parent), alarm(0), m_balanceWindow(0)
+MainWindow::MainWindow(QWidget* parent) :
+        QMainWindow(parent),
+        timer(0),
+        undoStack(0),
+        undoAction(0),
+        redoAction(0),
+        editMenu(0),
+        toolbarGroup(0),
+        alarm(0),
+        m_balanceWindow(0),
+        m_preferencesWindow(0),
+        m_preferences(0)
 {
     setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -182,7 +192,9 @@ void MainWindow::on_settingsButton_clicked()
                 this, SLOT(updateView()));
         connect(m_preferencesWindow, SIGNAL(workdayUpdated()),
                 this, SLOT(setAlarm()));
+
     }
+
     m_preferencesWindow->show();
 }
 
@@ -453,6 +465,7 @@ void MainWindow::setInactive(bool inactive)
 
 bool MainWindow::event (QEvent* e)
 {
+
     switch (e->type()) {
     case QEvent::WindowActivate:
         qDebug() << "*** Window activate";
@@ -468,3 +481,5 @@ bool MainWindow::event (QEvent* e)
     }
     return QMainWindow::event(e);
 }
+
+
