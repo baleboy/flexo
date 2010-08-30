@@ -1,3 +1,9 @@
+flexo (0.2.11) unstable; urgency=low
+
+  * Fixed: segfault when opening settings page 
+
+ -- Francesco Balestrieri <bale@balenet.com>  Sun, 29 Aug 2010 23:00:00 +0300
+
 flexo (0.2.10) unstable; urgency=low
 
   * Dialog to update checkin and checkout times includes date
