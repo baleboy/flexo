@@ -5,7 +5,7 @@ TEMPLATE = app
 TARGET = flexo 
 DEPENDPATH += .
 INCLUDEPATH += .
-CONFIG += qt release 
+CONFIG += qt
 
 # Input
 HEADERS += mainwindow.h \
@@ -21,7 +21,9 @@ HEADERS += mainwindow.h \
     preferences.h \
     timechangedialog.h \
     record.h \
-    recordstack.h
+    recordstack.h \
+    writer.h \
+    reader.h
 
 FORMS += mainwindow.ui \
     exitdialog.ui \
@@ -41,7 +43,9 @@ SOURCES += main.cpp \
     preferences.cpp \
     timechangedialog.cpp \
     record.cpp \
-    recordstack.cpp
+    recordstack.cpp \
+    writer.cpp \
+    reader.cpp
 
 RESOURCES += \
     resources.qrc
