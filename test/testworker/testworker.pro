@@ -12,7 +12,8 @@ DEFINES += WORKER_TEST
 # Input
 
 SOURCES += testworker.cpp ../../src/worker.cpp ../../src/constants.cpp \
-           ../../src/record.cpp ../../src/recordstack.cpp
+           ../../src/record.cpp ../../src/recordstack.cpp ../../src/reader.cpp \
+           ../../src/writer.cpp
 
 HEADERS += ../../src/worker.h ../../src/constants.h ../../src/record.h \
-           ../../src/recordstack.h
+           ../../src/recordstack.h ../../src/reader.h ../../writer.h

@@ -62,7 +62,7 @@ QDateTime Worker::checkin()
     Record r(CURRENT_TIME);
     int res = m_recordStack.push(r);
     assert(res == 0);
-    return r.checkinTime();
+    return m_recordStack.top().checkinTime();
 }
 
 int Worker::checkout()
@@ -237,6 +237,8 @@ QString Worker::print() const
     QString s;
     QTextStream out(&s);
     out << "workday length: " << m_workdayLength << endl;
+    out << "balance adjustment: " << m_balanceAdjustment << endl;
+
     for (int i = 0 ; i < m_recordStack.size() ; ++i) {
         out << "Record [" << i << "]: in "
             << m_recordStack.at(i).checkinTime().toString()
@@ -245,6 +247,27 @@ QString Worker::print() const
 
     }
     return s;
+}
+
+int Worker::records() const
+{
+    return m_recordStack.size();
+}
+
+QDateTime Worker::checkinAt(int i) const
+{
+    if (i < 0 || i >= records())
+        return QDateTime();
+
+    return m_recordStack.at(i).checkinTime();
+}
+
+QDateTime Worker::checkoutAt(int i) const
+{
+    if (i < 0 || i >= records())
+        return QDateTime();
+
+    return m_recordStack.at(i).checkoutTime();
 }
 
 QDataStream& operator>> (QDataStream& in, Worker& w)

@@ -146,6 +146,11 @@ public:
     void setWorkdayLength(int);
     bool isWorking() const;
 
+    int records() const;
+    QDateTime checkinAt(int) const;
+    QDateTime checkoutAt(int) const;
+
+
     friend QDataStream& operator<< (QDataStream&, const Worker&);
     friend QDataStream& operator>> (QDataStream&, Worker&);
 

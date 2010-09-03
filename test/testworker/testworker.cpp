@@ -22,6 +22,8 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtTest/QtTest>
 #include "worker.h"
 #include "constants.h"
+#include "writer.h"
+#include "reader.h"
 
 class TestWorker: public QObject
 {
@@ -43,6 +45,7 @@ private slots:
     void testPrint();
     void testUpdateCheckin();
     void testSetBalance();
+    void testReadWrite();
 };
 
 void TestWorker::testConstructor()
@@ -146,12 +149,12 @@ void TestWorker::testBalancePositive()
     out.setWorkdayLength(workday);
     clock_ = QDateTime::fromString("8:30", "hh:mm");
 
-    out.checkin();
+    QCOMPARE(out.checkin(), clock_);
     clock_=clock_.addSecs(worked);
 
     QCOMPARE(out.balance(), 0);
 
-    out.checkout();
+    QCOMPARE(out.checkout(), worked);
 
     qDebug() << out.print();
     QCOMPARE(out.balance(), worked-workday);
@@ -404,6 +407,62 @@ void TestWorker::testSetBalance()
     w.checkout();
     w.setBalance(500);
     QCOMPARE(w.balance(), 500);
+}
+
+void TestWorker::testReadWrite()
+{
+    clock_ = QDateTime::fromString("M1d1y201011:01:02",
+                                             "'M'M'd'd'y'yyyyhh:mm:ss");
+    int delta = 500;
+    QString testFile = QDir::home().filePath("test.xml");
+
+    Worker w1;
+    w1.setWorkdayLength(7*3600);
+    for (int d = 0 ; d < 10 ; ++d) {
+        for (int i = 0 ; i < 10 ; ++i) {
+            QCOMPARE(w1.checkin(), clock_);
+            clock_ = clock_.addSecs(delta);
+            w1.checkout();
+            clock_ = clock_.addSecs(delta);
+        }
+        clock_ = clock_.addDays(1);
+    }
+
+    w1.checkin();
+
+    w1.setBalance(120000);
+
+    QVERIFY(w1.isWorking());
+
+    Writer writer(w1);
+    QVERIFY(writer.writeFile(testFile));
+
+    Worker w2;
+
+    Reader reader(w2);
+    QVERIFY(reader.readFile(testFile));
+
+    QVERIFY(w2.isWorking());
+    QCOMPARE(w1.records(), w2.records());
+    QCOMPARE(w1.balance(), w2.balance());
+    QCOMPARE(w1.workdayLength(), w2.workdayLength());
+    for (int i = 0 ; i < w1.records() ; ++i) {
+        QCOMPARE(w1.checkinAt(i), w2.checkinAt(i));
+        QCOMPARE(w1.checkoutAt(i), w2.checkoutAt(i));
+    }
+
+    w1.checkout();
+    w2.clear();
+    QVERIFY(writer.writeFile(testFile));
+    QVERIFY(reader.readFile(testFile));
+
+    QVERIFY(!w2.isWorking());
+    QCOMPARE(w1.records(), w2.records());
+    QCOMPARE(w1.balance(), w2.balance());
+    for (int i = 0 ; i < w1.records() ; ++i) {
+        QCOMPARE(w1.checkinAt(i), w2.checkinAt(i));
+        QCOMPARE(w1.checkoutAt(i), w2.checkoutAt(i));
+    }
 }
 
 QTEST_MAIN(TestWorker)

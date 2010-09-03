@@ -12,7 +12,6 @@ extern const QString APP_NAME;
 extern const QString APP_ID;
 extern const QString DBUS_PATH;
 extern const QString SAVEFILE;
-extern const QString LEGACY_SAVEFILE;
 
 #ifdef WORKER_TEST
 extern QDateTime clock_;

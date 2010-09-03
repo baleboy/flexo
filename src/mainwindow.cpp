@@ -40,6 +40,8 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 #include "constants.h"
 #include "preferences.h"
 #include "timechangedialog.h"
+#include "writer.h"
+#include "reader.h"
 
 MainWindow::MainWindow(QWidget* parent) :
         QMainWindow(parent),
@@ -201,13 +203,9 @@ void MainWindow::on_settingsButton_clicked()
 void MainWindow::save()
 {
     m_preferences->save();
-    QFile file(SAVEFILE);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Couldn't open savefile";
-        return;
-    }
-    QDataStream out(&file);
-    out << worker;
+
+    Writer writer(worker);
+    writer.writeFile(SAVEFILE);
 
     qDebug() << worker.print();
 }
@@ -216,23 +214,11 @@ void MainWindow::restore()
 {
     m_preferences->load();
 
-    // if there is data from Flexo pre-0.2.10, import it
-    // and erase the file
-    QFile oldfile(LEGACY_SAVEFILE);
-    if (oldfile.open(QIODevice::ReadOnly)) {
-        restoreLegacyData(oldfile);
-        oldfile.remove();
-    }
+    Reader reader(worker);
+    reader.checkForLegacyData();
+    if (!reader.readFile(SAVEFILE))
+        qWarning() << reader.errorString();
 
-    QFile file(SAVEFILE);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "restore: no datafile";
-        worker.setWorkdayLength(DEFAULT_WORKDAY);
-    }
-    else {
-        QDataStream in(&file);
-        in >> worker;
-    }
     qDebug() << worker.print();
 }
 
@@ -421,36 +407,6 @@ QString MainWindow::timeText(const QDateTime &t)
 void MainWindow::showWarning(const QString &msg)
 {
     QMaemo5InformationBox::information(this, msg);
-}
-
-void MainWindow::restoreLegacyData(QFile& file)
-{
-    quint32 balance;
-    quint8 working;
-    quint32 doneToday;
-    quint32 wdayLength;
-    quint8 hasTime;
-    QDateTime checkinTime;
-    QDateTime checkoutTime;
-
-    QDataStream in(&file);
-
-    in >> balance >> working >> doneToday >> wdayLength >> hasTime;
-
-    if (hasTime) {
-        in >> checkinTime;
-        worker.checkin();
-        worker.updateCheckinTime(checkinTime);
-    }
-    in >> hasTime;
-    if (hasTime && !working) {
-        in >> checkoutTime;
-        worker.checkout();
-        worker.updateCheckoutTime(checkoutTime);
-    }
-    qDebug() << "Old balance: " << balance;
-    worker.setWorkdayLength(wdayLength);
-    worker.setBalance(balance);
 }
 
 void MainWindow::setInactive(bool inactive)
