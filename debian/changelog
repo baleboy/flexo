@@ -1,3 +1,9 @@
+flexo (0.2.12) unstable; urgency=low
+
+  * Fixed: balance calculation was including days with no check-in 
+
+ -- Francesco Balestrieri <bale@balenet.com>  Sat, 4 Sep 2010 08:00:00 +0300
+
 flexo (0.2.11) unstable; urgency=low
 
   * Fixed: segfault when opening settings page 

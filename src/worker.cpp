@@ -97,17 +97,15 @@ int Worker::balanceFromHistory() const
         lastRecord = m_recordStack.size() - 1;
     }
 
-    // first calculate the amount of work that should have been done
-    // based on the number of days, then the amount of work done based
-    // on the records. Won't get me a job at Google but it works.
     int balance = 0;
-    for (QDate day = m_recordStack.at(0).checkinTime().date() ; day <= lastDay ; day = day.addDays(1)) {
-        if (!isHoliday(day))
-            balance -= m_workdayLength;
-    }
-    qDebug() << "balance expected: " << balance;
-
+    QDate currentDay;
     for (int i = 0; i <= lastRecord; ++i) {
+        // at every day change that is a working day, subtract the balance
+        if (m_recordStack.at(i).checkinTime().date() != currentDay) {
+            currentDay = m_recordStack.at(i).checkinTime().date();
+            if (!isHoliday(currentDay))
+                balance -= m_workdayLength;
+        }
         balance += m_recordStack.at(i).elapsed();
         qDebug() << "elapsed: " << m_recordStack.at(i).elapsed();
     }

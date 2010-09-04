@@ -43,6 +43,7 @@ private slots:
     void testPrint();
     void testUpdateCheckin();
     void testSetBalance();
+    void testDaySkip();
 };
 
 void TestWorker::testConstructor()
@@ -215,7 +216,7 @@ void TestWorker::testDayChange()
     clock_ = checkoutTime;
     out.checkout();
 
-    QCOMPARE(out.balance(), (checkinTime.secsTo(checkoutTime) - 2*workday));
+    QCOMPARE(out.balance(), (checkinTime.secsTo(checkoutTime) - workday));
 
     out.checkin();
 }
@@ -393,7 +394,7 @@ void TestWorker::testSetBalance()
     int workday = 3600*7.5;
     w.setWorkdayLength(workday);
     clock_ = QDateTime::fromString("M1d1y201011:01:02",
-                                                  "'M'M'd'd'y'yyyyhh:mm:ss");
+                                   "'M'M'd'd'y'yyyyhh:mm:ss");
 
     w.checkin();
     clock_ = clock_.addSecs(3600*8);
@@ -404,6 +405,27 @@ void TestWorker::testSetBalance()
     w.checkout();
     w.setBalance(500);
     QCOMPARE(w.balance(), 500);
+}
+
+void TestWorker::testDaySkip()
+{
+    Worker w;
+    int workday = 3600*7.5;
+    w.setWorkdayLength(workday);
+    clock_ = QDateTime::fromString("M1d4y201011:01:02",
+                                   "'M'M'd'd'y'yyyyhh:mm:ss");
+    int delta = 3600*8;
+    w.checkin();
+    clock_ = clock_.addSecs(delta);
+    w.checkout();
+
+    // skip a day
+    clock_ = clock_.addDays(2);
+    w.checkin();
+    clock_ = clock_.addSecs(delta);
+    w.checkout();
+
+    QCOMPARE(w.balance(), 2*delta - 2*workday);
 }
 
 QTEST_MAIN(TestWorker)
