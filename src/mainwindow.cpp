@@ -96,14 +96,16 @@ void MainWindow::updateView()
     if (worker.isWorking()) {
         checkInToggle->setChecked(true);
         if (worker.currentCheckin().isValid()) {
-            checkInText->setText("Checked in at " + timeText(worker.currentCheckin()));
+            checkInText->setText("Checked in at " + timeText(worker.currentCheckin())
+                                 + " on " + dateText(worker.currentCheckin()));
             showText = true;
         }
     }
     else {
         checkInToggle->setChecked(false);
         if (worker.currentCheckout().isValid()){
-            checkInText->setText("Checked out at " + timeText(worker.currentCheckout()));
+            checkInText->setText("Checked out at " + timeText(worker.currentCheckout())
+                                 + " on " + dateText(worker.currentCheckout()));
             showText = true;
         }
     }
@@ -416,6 +418,11 @@ void MainWindow::updateTime()
 QString MainWindow::timeText(const QDateTime &t)
 {
     return t.time().toString("hh:mm");
+}
+
+QString MainWindow::dateText(const QDateTime &t)
+{
+    return t.date().toString("dd/MM");
 }
 
 void MainWindow::showWarning(const QString &msg)
