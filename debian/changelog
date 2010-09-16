@@ -1,6 +1,6 @@
 flexo (0.3.0) unstable; urgency=low
 
-  * History of check ins and check outs can be displayed 
+  * New view to show history of check-ins and check-outs 
   * Changed savefile format to XML
 
  -- Francesco Balestrieri <bale@balenet.com>  Sat, 4 Sep 2010 08:00:00 +0300
