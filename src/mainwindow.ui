@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>836</width>
-    <height>482</height>
+    <height>490</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -151,12 +151,6 @@ QPushButton:pressed {
       </item>
       <item>
        <widget class="QPushButton" name="checkInText">
-        <property name="font">
-         <font>
-          <family>Arial</family>
-          <pointsize>14</pointsize>
-         </font>
-        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>

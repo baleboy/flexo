@@ -37,7 +37,7 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index ) const;
 
-    enum { MainText1Role = Qt::UserRole, MainText2Role, SubText1Role, SubText2Role };
+    enum { MainTextRole = Qt::UserRole, NumberRole, SubTextRole };
 
 };
 

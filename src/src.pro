@@ -23,13 +23,18 @@ HEADERS += mainwindow.h \
     record.h \
     recordstack.h \
     writer.h \
-    reader.h
+    reader.h  \
+    historyview.h \
+    historydelegate.h \
+    historymodel.h
 
 FORMS += mainwindow.ui \
     exitdialog.ui \
     balancewindow.ui \
     preferenceswindow.ui \
-    timechangedialog.ui
+    timechangedialog.ui \
+    historyview.ui
+
 SOURCES += main.cpp \
     mainwindow.cpp \
     worker.cpp \
@@ -45,7 +50,10 @@ SOURCES += main.cpp \
     record.cpp \
     recordstack.cpp \
     writer.cpp \
-    reader.cpp
+    reader.cpp \
+    historyview.cpp \
+    historydelegate.cpp \
+    historymodel.cpp
 
 RESOURCES += \
     resources.qrc

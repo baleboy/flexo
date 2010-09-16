@@ -9,5 +9,7 @@
         <file>images/gear-off.png</file>
         <file>images/scale-off.png</file>
         <file>images/toolbar-bg.png</file>
+        <file>images/greenbox.png</file>
+        <file>images/redbox.png</file>
     </qresource>
 </RCC>

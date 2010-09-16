@@ -84,6 +84,7 @@ private:
     void createUndoActions();
     void showWarning(const QString&);
     QString timeText(const QDateTime&);
+    QString dateText(const QDateTime&);
     void restoreLegacyData(QFile&);
 
     Alarm* createAlarm();

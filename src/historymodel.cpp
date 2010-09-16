@@ -79,38 +79,42 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
     if (index.row() >= numberOfDays() || index.row() < 0)
         return QVariant();
 
+    int reverseIndex = numberOfDays() - index.row() - 1;
+
     QLocale locale(QLocale::English);
 
     switch (role) {
     case Qt::DisplayRole:
-    case HistoryDelegate::MainText1Role:
-        return locale.toString(m_worker->checkinAt(indexOfDay(index.row())).date(), "dddd MMM dd yyyy");
+    case HistoryDelegate::MainTextRole:
+        return locale.toString(m_worker->checkinAt(indexOfDay(reverseIndex)).date(), "dddd MMM dd yyyy");
 
-    case HistoryDelegate::MainText2Role: {
-            int i = indexOfDay(index.row());
+    case HistoryDelegate::NumberRole: {
+            int i = indexOfDay(reverseIndex);
             int balance = 0;
-            QDate day = m_worker->checkinAt(indexOfDay(index.row())).date();
+            QDate day = m_worker->checkinAt(indexOfDay(reverseIndex)).date();
             while (i < m_worker->records() && (day == m_worker->checkinAt(i).date())) {
                 if (m_worker->checkoutAt(i).isValid())
                     balance += m_worker->checkinAt(i).secsTo(m_worker->checkoutAt(i));
                 ++i;
             }
-            return (balance > m_worker->workdayLength()? "+" : "") +
-                    QString::number(double(balance - m_worker->workdayLength()) / 3600.0,
-                                    'f', 1);
+            return double(balance - m_worker->workdayLength()) / 3600.0;
         }
 
-    case HistoryDelegate::SubText1Role: {
-            int i = indexOfDay(index.row());
-            QDate day = m_worker->checkinAt(indexOfDay(index.row())).date();
+    case HistoryDelegate::SubTextRole: {
+            int i = indexOfDay(reverseIndex);
+            QDate day = m_worker->checkinAt(indexOfDay(reverseIndex)).date();
             while (i < m_worker->records() && (day == m_worker->checkinAt(i).date())) {
                 ++i;
             }
             if (i != 0)
                 --i;
-            return  "Checked in at " +
-                    m_worker->checkinAt(indexOfDay(index.row())).time().toString("hh:mm")
-                    + ", checked out at " + m_worker->checkoutAt(i).time().toString("hh:mm");
+            QString text = "Checked in at " +
+                    m_worker->checkinAt(indexOfDay(reverseIndex)).time().toString("hh:mm");
+
+            if (m_worker->checkoutAt(i).isValid())
+                   text += ", checked out at " + m_worker->checkoutAt(i).time().toString("hh:mm");
+
+            return text;
         }
     default:
         return QVariant();

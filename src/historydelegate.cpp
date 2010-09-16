@@ -32,30 +32,34 @@ HistoryDelegate::HistoryDelegate(QObject *parent)
 void HistoryDelegate:: paint(QPainter *painter, const QStyleOptionViewItem &option,
            const QModelIndex &index) const
 {
+    static QPixmap redBox(":/images/redbox.png");
+    static QPixmap greenBox(":/images/greenbox.png");
+
     painter->save();
 
     painter->setFont(QFont("Arial", 20));
 
-    QString txt = index.data(MainText1Role).toString();
+    QString txt = index.data(MainTextRole).toString();
 
     painter->drawText(option.rect.x() + 20, option.rect.y() + 35, txt);
 
-    txt = index.data(MainText2Role).toString();
+    double number = index.data(NumberRole).toDouble();
+    txt = QString::number(number, 'f', 1);
 
     QFont bigFont("Arial", 30);
     QFontMetrics fm(bigFont);
-    int textWidth = fm.width(txt);
     painter->setFont(bigFont);
+    QPixmap& box = (number >= 0 ? greenBox : redBox);
+    painter->drawPixmap(option.rect.x() + 644, option.rect.y() + 8, box);
 
-    painter->drawText(option.rect.x() + 730 - textWidth, option.rect.y() + 45, txt);
+    painter->setPen(Qt::white);
+    int offset = 644 + (box.width() - fm.width(txt)) / 2;
+    painter->drawText(option.rect.x() + offset, option.rect.y() + 47, txt);
 
     painter->setPen(Qt::gray);
     painter->setFont(QFont("Arial", 15));
-    txt = index.data(SubText1Role).toString();
+    txt = index.data(SubTextRole).toString();
     painter->drawText(option.rect.x() + 20, option.rect.y() + 65, txt);
-
-    txt = index.data(SubText2Role).toString();
-    painter->drawText(option.rect.x() + 300, option.rect.y() + 55, txt);
 
     painter->restore();
 }

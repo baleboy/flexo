@@ -90,16 +90,10 @@
    <item row="2" column="1">
     <widget class="QMaemo5ValueButton" name="balanceUnitButton">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>18</pointsize>
-      </font>
      </property>
      <property name="text">
       <string>Balance shown in</string>
@@ -108,12 +102,6 @@
    </item>
    <item row="3" column="1">
     <widget class="QPushButton" name="historyButton">
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
      <property name="text">
       <string>History...</string>
      </property>
