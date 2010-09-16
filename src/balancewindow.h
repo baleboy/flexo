@@ -6,6 +6,7 @@
 class QUndoStack;
 class Worker;
 class Preferences;
+class HistoryView;
 
 class BalanceWindow : public QWidget, private Ui::BalanceWindow
 {
@@ -24,6 +25,7 @@ protected:
 
 private slots:
     void on_balanceEdit_editingFinished();
+    void on_historyButton_clicked();
 
 private:
 
@@ -31,6 +33,7 @@ private:
     Worker *m_worker;
     Preferences *m_preferences;
     QString m_currentText;
+    HistoryView* m_historyView;
 };
 
 #endif // BALANCEWINDOW_H

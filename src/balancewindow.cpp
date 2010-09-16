@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "worker.h"
 #include "preferences.h"
+#include "historyview.h"
 
 BalanceWindow::BalanceWindow(QUndoStack *u, Worker *w,
                              Preferences *p, QWidget *parent) :
@@ -17,7 +18,8 @@ QWidget(parent),
 m_undoStack(u),
 m_worker(w),
 m_preferences(p),
-m_currentText("")
+m_currentText(""),
+m_historyView(0)
 {
     setupUi(this);
 
@@ -72,4 +74,14 @@ void BalanceWindow::showEvent(QShowEvent *event)
 {
     showBalance();
     event->accept();
+}
+
+void BalanceWindow::on_historyButton_clicked()
+{
+    if (!m_historyView) {
+        m_historyView = new HistoryView(m_worker, this);
+        m_historyView->setAttribute(Qt::WA_Maemo5StackedWindow);
+        m_historyView->setWindowFlags(m_historyView->windowFlags() | Qt::Window);
+    }
+    m_historyView->show();
 }
