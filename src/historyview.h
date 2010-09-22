@@ -23,6 +23,11 @@ signals:
 
 protected:
     void changeEvent(QEvent *e);
+    void showEvent (QShowEvent *e);
+
+private:
+
+    Worker *m_worker;
 };
 
 #endif // HISTORYVIEW_H
