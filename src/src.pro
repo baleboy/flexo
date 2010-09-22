@@ -24,9 +24,9 @@ HEADERS += mainwindow.h \
     recordstack.h \
     writer.h \
     reader.h  \
-    historyview.h \
     historydelegate.h \
-    historymodel.h
+    historymodel.h \
+    historyview.h
 
 FORMS += mainwindow.ui \
     exitdialog.ui \
@@ -51,9 +51,9 @@ SOURCES += main.cpp \
     recordstack.cpp \
     writer.cpp \
     reader.cpp \
-    historyview.cpp \
     historydelegate.cpp \
-    historymodel.cpp
+    historymodel.cpp \
+    historyview.cpp
 
 RESOURCES += \
     resources.qrc

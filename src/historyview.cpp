@@ -1,42 +1,41 @@
-/*
-
-Copyright (C) 2010 Francesco Balestrieri
-
-This file is part of Flexo - a time tracking application.
-
-Flexo is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Flexo is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Flexo. If not, see <http://www.gnu.org/licenses/>.
-
-*/
-
 #include "historyview.h"
 #include "worker.h"
 #include "historymodel.h"
 #include "historydelegate.h"
 
 HistoryView::HistoryView(Worker *worker, QWidget *parent) :
-        QWidget(parent) {
+    QMainWindow(parent) {
     setupUi(this);
 
     HistoryModel *model = new HistoryModel(worker);
     listView->setModel(model);
     HistoryDelegate *delegate = new HistoryDelegate(this);
     listView->setItemDelegate(delegate);
+
+    connect(this, SIGNAL(modeChanged(int)), model, SLOT(setMode(int)));
+
+    QActionGroup *filterGroup = new QActionGroup(this);
+    filterGroup->setExclusive(true);
+
+    QAction *dayAction = new QAction(tr("Day"), filterGroup);
+    dayAction->setCheckable(true);
+    dayAction->setChecked(true);
+    connect(dayAction, SIGNAL(triggered()), this, SLOT(dayModeSelected()));
+
+    QAction *weekAction = new QAction(tr("Week"), filterGroup);
+    weekAction->setCheckable(true);
+    connect(weekAction, SIGNAL(triggered()), this, SLOT(weekModeSelected()));
+
+    QAction *monthAction = new QAction(tr("Month"), filterGroup);
+    monthAction->setCheckable(true);
+    connect(monthAction, SIGNAL(triggered()), this, SLOT(monthModeSelected()));
+
+    menuBar()->addActions(filterGroup->actions());
 }
 
 void HistoryView::changeEvent(QEvent *e)
 {
-    QWidget::changeEvent(e);
+    QMainWindow::changeEvent(e);
     switch (e->type()) {
     case QEvent::LanguageChange:
         retranslateUi(this);
@@ -44,4 +43,19 @@ void HistoryView::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void HistoryView::dayModeSelected()
+{
+    emit modeChanged(HistoryModel::dayMode);
+}
+
+void HistoryView::weekModeSelected()
+{
+    emit modeChanged(HistoryModel::weekMode);
+}
+
+void HistoryView::monthModeSelected()
+{
+    emit modeChanged(HistoryModel::monthMode);
 }

@@ -206,12 +206,12 @@ bool Worker::isOvertime() const
             ((total == legalWork) && isWorking()));
 }
 
-bool Worker::isHoliday(const QDate& d) const
+bool Worker::isHoliday(const QDate& d)
 {
     return (d.dayOfWeek() == 6) || (d.dayOfWeek() == 7);
 }
 
-bool Worker::isHoliday() const
+bool Worker::isHoliday()
 {
     return (isHoliday(CURRENT_TIME.date()));
 }

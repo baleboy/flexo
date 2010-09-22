@@ -23,6 +23,7 @@ along with Flexo. If not, see <http://www.gnu.org/licenses/>.
 #define HISTORYMODEL_H
 
 #include <QAbstractListModel>
+#include <QLocale>
 
 #include "worker.h"
 
@@ -37,13 +38,22 @@ public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
+    enum { dayMode, weekMode, monthMode };
+
+public slots:
+    void setMode(int m);
 
 private:
 
    Worker* m_worker;
+   int m_mode;
 
-   int indexOfDay(int day) const;
-   int numberOfDays() const;
+   int indexOfPeriod(int period) const;
+   int numberOfPeriods() const;
+   int periodByMode(int i) const;
+   QString dateByMode(const QDateTime& dateTime) const;
+
+   static QLocale m_locale;
 };
 
 #endif // TABLEMODEL_H

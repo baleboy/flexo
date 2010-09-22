@@ -37,7 +37,10 @@ void HistoryDelegate:: paint(QPainter *painter, const QStyleOptionViewItem &opti
 
     painter->save();
 
-    painter->setFont(QFont("Arial", 20));
+
+    QFont font;
+    font.setPixelSize(25);
+    painter->setFont(font);
 
     QString txt = index.data(MainTextRole).toString();
 
@@ -46,9 +49,9 @@ void HistoryDelegate:: paint(QPainter *painter, const QStyleOptionViewItem &opti
     double number = index.data(NumberRole).toDouble();
     txt = QString::number(number, 'f', 1);
 
-    QFont bigFont("Arial", 30);
-    QFontMetrics fm(bigFont);
-    painter->setFont(bigFont);
+    font.setPixelSize(35);
+    QFontMetrics fm(font);
+    painter->setFont(font);
     QPixmap& box = (number >= 0 ? greenBox : redBox);
     painter->drawPixmap(option.rect.x() + 644, option.rect.y() + 8, box);
 
@@ -57,7 +60,8 @@ void HistoryDelegate:: paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->drawText(option.rect.x() + offset, option.rect.y() + 47, txt);
 
     painter->setPen(Qt::gray);
-    painter->setFont(QFont("Arial", 15));
+    font.setPixelSize(20);
+    painter->setFont(font);
     txt = index.data(SubTextRole).toString();
     painter->drawText(option.rect.x() + 20, option.rect.y() + 65, txt);
 

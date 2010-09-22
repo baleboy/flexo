@@ -117,12 +117,12 @@ public:
     /*
      * Returns true if the current time is a holiday
      */
-    bool isHoliday() const;
+    static bool isHoliday();
 
     /*
      * Returns true if the date given as parameter is a holiday
      */
-    bool isHoliday(const QDate&) const;
+    static bool isHoliday(const QDate&);
 
     QString print() const;
 

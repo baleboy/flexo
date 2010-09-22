@@ -24,8 +24,10 @@ along with Flexo. If not, see <http://www.gnu.org/licenses/>.
 #include "historymodel.h"
 #include "historydelegate.h"
 
+QLocale HistoryModel::m_locale(QLocale::English);
+
 HistoryModel::HistoryModel(Worker* worker, QObject *parent) :
-    QAbstractListModel(parent), m_worker(worker)
+        QAbstractListModel(parent), m_worker(worker), m_mode(dayMode)
 {
 }
 
@@ -33,42 +35,81 @@ int HistoryModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
-    return numberOfDays();
+    return numberOfPeriods();
 }
 
-int HistoryModel::numberOfDays() const
+void HistoryModel::setMode(int m)
 {
-    QDate day;
+    m_mode = m;
+    emit layoutChanged();
+}
+
+int HistoryModel::periodByMode(int i) const
+{
+    int p;
+    switch (m_mode) {
+    case dayMode:
+        p = m_worker->checkinAt(i).date().day();
+        break;
+    case weekMode:
+        p = m_worker->checkinAt(i).date().weekNumber();
+        break;
+    case monthMode:
+        p = m_worker->checkinAt(i).date().month();
+        break;
+    }
+    return p;
+}
+int HistoryModel::numberOfPeriods() const
+{
+    int lastPeriod = -1;
     int count = 0;
 
     for (int i = 0 ; i < m_worker->records() ; ++i) {
-        if (day != m_worker->checkinAt(i).date()) {
-            day = m_worker->checkinAt(i).date();
+        int currentPeriod = periodByMode(i);
+        if (lastPeriod != currentPeriod) {
+            lastPeriod = currentPeriod;
             count++;
         }
     }
-
     return count;
 }
 
-int HistoryModel::indexOfDay(int day) const
+
+int HistoryModel::indexOfPeriod(int p) const
 {
     if (m_worker->records() == 0)
         return 0;
 
-    int dayIndex = 0;
+    int periodIndex = 0;
     int i = 0;
-    QDate date = m_worker->checkinAt(0).date();
+    int lastPeriod = periodByMode(0);
 
-    while (dayIndex != day) {
-        if (date != m_worker->checkinAt(i).date()) {
-            if (++dayIndex == day)
+    while (periodIndex != p) {
+        if (lastPeriod != periodByMode(i)) {
+            if (++periodIndex == p)
                 break;
-            date = m_worker->checkinAt(i).date();
+            lastPeriod = periodByMode(i);
         }
         ++i;
     }
     return i;
+}
+
+QString HistoryModel::dateByMode(const QDateTime& t) const
+{
+    QString text;
+    switch (m_mode) {
+    case dayMode:
+        text = t.time().toString("hh:mm");
+        break;
+    case weekMode:
+        text = m_locale.toString(t.date(), "MMM dd");
+        break;
+    case monthMode:
+        text = m_locale.toString(t.date(), "ddd dd");
+    }
+    return text;
 }
 
 QVariant HistoryModel::data(const QModelIndex &index, int role) const
@@ -76,43 +117,64 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= numberOfDays() || index.row() < 0)
+    if (index.row() >= numberOfPeriods() || index.row() < 0)
         return QVariant();
 
-    int reverseIndex = numberOfDays() - index.row() - 1;
-
-    QLocale locale(QLocale::English);
+    int reverseIndex = numberOfPeriods() - index.row() - 1;
 
     switch (role) {
     case Qt::DisplayRole:
-    case HistoryDelegate::MainTextRole:
-        return locale.toString(m_worker->checkinAt(indexOfDay(reverseIndex)).date(), "dddd MMM dd yyyy");
+    case HistoryDelegate::MainTextRole: {
+            QString txt;
+            switch (m_mode) {
+            case dayMode:
+                txt = m_locale.toString(m_worker->checkinAt(indexOfPeriod(reverseIndex)).date(), "dddd MMM dd yyyy");
+                break;
+            case weekMode:
+                txt = "Week " +
+                      QString::number(m_worker->checkinAt(indexOfPeriod(reverseIndex)).date().weekNumber()) +
+                      + ", " + m_locale.toString(m_worker->checkinAt(indexOfPeriod(reverseIndex)).date(), "yyyy");
+                break;
+            case monthMode:
+                txt = m_locale.toString(m_worker->checkinAt(indexOfPeriod(reverseIndex)).date(), "MMMM yyyy");
+                break;
+            }
+
+            return txt;
+        }
 
     case HistoryDelegate::NumberRole: {
-            int i = indexOfDay(reverseIndex);
-            int balance = 0;
-            QDate day = m_worker->checkinAt(indexOfDay(reverseIndex)).date();
-            while (i < m_worker->records() && (day == m_worker->checkinAt(i).date())) {
+            int i = indexOfPeriod(reverseIndex);
+            QDate day = m_worker->checkinAt(i).date();
+
+            int actual = 0;
+            int wanted = Worker::isHoliday(day) ? 0 : m_worker->workdayLength();
+            int currentPeriod = periodByMode(indexOfPeriod(reverseIndex));
+            while (i < m_worker->records() && (currentPeriod == periodByMode(i))) {
+                if (day != m_worker->checkinAt(i).date()) {
+                    day = m_worker->checkinAt(i).date();
+                    wanted += Worker::isHoliday(day) ? 0 : m_worker->workdayLength();
+                }
                 if (m_worker->checkoutAt(i).isValid())
-                    balance += m_worker->checkinAt(i).secsTo(m_worker->checkoutAt(i));
+                    actual += m_worker->checkinAt(i).secsTo(m_worker->checkoutAt(i));
                 ++i;
             }
-            return double(balance - m_worker->workdayLength()) / 3600.0;
+            return double(actual - wanted) / 3600.0;
         }
 
     case HistoryDelegate::SubTextRole: {
-            int i = indexOfDay(reverseIndex);
-            QDate day = m_worker->checkinAt(indexOfDay(reverseIndex)).date();
-            while (i < m_worker->records() && (day == m_worker->checkinAt(i).date())) {
+            int i = indexOfPeriod(reverseIndex);
+            int p = i;
+            int currentPeriod = periodByMode(p);
+            while (i < m_worker->records() && (currentPeriod == periodByMode(i))) {
                 ++i;
             }
             if (i != 0)
                 --i;
-            QString text = "Checked in at " +
-                    m_worker->checkinAt(indexOfDay(reverseIndex)).time().toString("hh:mm");
+            QString text = "First check-in: " + dateByMode(m_worker->checkinAt(p));
 
             if (m_worker->checkoutAt(i).isValid())
-                   text += ", checked out at " + m_worker->checkoutAt(i).time().toString("hh:mm");
+                text += "  Last check-out: " + dateByMode(m_worker->checkoutAt(i));
 
             return text;
         }
