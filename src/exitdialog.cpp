@@ -25,5 +25,6 @@ ExitDialog::ExitDialog(QWidget* parent) :
         QDialog(parent)
 {
 	// empty comment
+	// another
     setupUi(this);
 }
