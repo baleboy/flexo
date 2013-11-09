@@ -24,5 +24,6 @@ along with Flexo.  If not, see <http://www.gnu.org/licenses/>.
 ExitDialog::ExitDialog(QWidget* parent) :
         QDialog(parent)
 {
+	// empty comment
     setupUi(this);
 }
