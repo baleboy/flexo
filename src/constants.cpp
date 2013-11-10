@@ -4,6 +4,7 @@
 #include "constants.h"
 
 // dummy comment
+// again
 
 const int DEFAULT_WORKDAY = 8.0*3600.0;
 const int TIMER_VALUE_IN_MSEC = 60000;
